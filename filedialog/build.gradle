@@ -34,16 +34,3 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':mountpoint')
 }
-
-task deleteJar(type: Delete) {
-    delete 'jars/filedialog.jar'
-}
-
-task createJar(type: Copy) {
-    from('build/intermediates/bundles/debug/')
-    into('jars/')
-    include('classes.jar')
-    rename('classes.jar', 'filedialog.jar')
-}
-
-createJar.dependsOn(deleteJar, build)
