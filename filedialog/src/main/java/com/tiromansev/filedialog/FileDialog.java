@@ -35,8 +35,9 @@ public class FileDialog {
 	private final Activity mContext;
 	public String defaultFileName = "";
 	private String selectedFileName = defaultFileName;
+
 	public static final String FILE_OPEN = "fileOpen";
-	private static final String FILE_SAVE = "fileSave";
+	public static final String FILE_SAVE = "fileSave";
 	public static final String FOLDER_CHOOSE = "folderChoose";
 
     private int mFileType;
@@ -82,7 +83,6 @@ public class FileDialog {
 
 	public FileDialog(Activity context,
                       String fileSelectType,
-                      int fileType,
                       boolean canExplore,
                       boolean useOldFileDialog,
                       SimpleFileDialogListener simpleFileDialogListener) {
@@ -100,7 +100,6 @@ public class FileDialog {
                 selectType = fileOpen;
                 break;
         }
-        mFileType = fileType;
         mCanExplore = canExplore;
         mContext = context;
         mSimplefiledialoglistener = simpleFileDialogListener;
