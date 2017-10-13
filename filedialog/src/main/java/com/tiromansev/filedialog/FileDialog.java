@@ -418,8 +418,8 @@ public class FileDialog {
         titleParams.setMargins(dialogMargin, dialogMargin, dialogMargin, dialogBottomMargin);
         titleView.setLayoutParams(titleParams);
 
-        TextView tvTitle = titleView.findViewById(R.id.tvFileTitle);
-        ImageButton addFolder = titleView.findViewById(R.id.btnAddFolder);
+        TextView tvTitle = (TextView) titleView.findViewById(R.id.tvFileTitle);
+        ImageButton addFolder = (ImageButton) titleView.findViewById(R.id.btnAddFolder);
         final String newFolder = mContext.getResources().getString(R.string.caption_new_folder_name);
         final String failedToCreateFolder = mContext.getResources().getString(R.string.message_failed_to_create_folder);
         addFolder.setOnClickListener(new View.OnClickListener() {
@@ -532,14 +532,14 @@ public class FileDialog {
                 if (convertView == null) {
                     convertView = mInflater.inflate(R.layout.view_file_dialog_item, null);
                     holder = new ViewHolder();
-                    holder.txtTitle = convertView.findViewById(R.id.tvFileItem);
-                    holder.imageView = convertView.findViewById(R.id.ivFileImage);
+                    holder.txtTitle = (TextView) convertView.findViewById(R.id.tvFileItem);
+                    holder.imageView = (ImageView) convertView.findViewById(R.id.ivFileImage);
                     convertView.setTag(holder);
                 } else {
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                rlDirItem = convertView.findViewById(R.id.rlDirItem);
+                rlDirItem = (RelativeLayout) convertView.findViewById(R.id.rlDirItem);
                 holder.txtTitle.setText(rowItem.getTitle());
                 int bottomToolbarHeight = (int) mContext.getResources().getDimension(R.dimen.bottom_toolbar_height);
                 int dialogMargin = (int) mContext.getResources().getDimension(R.dimen.dialog_margin);

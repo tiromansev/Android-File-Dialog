@@ -14,7 +14,7 @@ public class DialogUtils {
                                         final StringValueListener valueListener) {
         LinearLayout dialogView =
                 (LinearLayout) context.getLayoutInflater().inflate(R.layout.view_string, null);
-        final EditText edtValue = dialogView.findViewById(R.id.edtStringValue);
+        final EditText edtValue = (EditText) dialogView.findViewById(R.id.edtStringValue);
         edtValue.setText(value);
         new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
                 .setTitle(title)
