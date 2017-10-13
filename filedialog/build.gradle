@@ -32,5 +32,5 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:$support"
     testCompile 'junit:junit:4.12'
-    compile project(':mountpoint')
+    compile files('src/main/extra/system.jar')
 }

@@ -1,4 +1,4 @@
-package com.library.mountpoint.datasource;
+package com.tiromansev.filedialog.datasource;
 
 import android.annotation.TargetApi;
 import android.os.Build;

@@ -1,10 +1,10 @@
-package com.library.mountpoint.datasource.fast;
+package com.tiromansev.filedialog.datasource.fast;
 
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.StatFs;
 
-import com.library.mountpoint.datasource.StatFsSource;
+import com.tiromansev.filedialog.datasource.StatFsSource;
 
 public class StatFsSourceImpl implements StatFsSource {
 

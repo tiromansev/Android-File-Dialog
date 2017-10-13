@@ -1,10 +1,10 @@
-package com.library.mountpoint.datasource;
+package com.tiromansev.filedialog.datasource;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 
-import com.library.mountpoint.datasource.fast.DefaultDataSource;
+import com.tiromansev.filedialog.datasource.fast.DefaultDataSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;

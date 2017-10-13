@@ -1,4 +1,4 @@
-package com.library.mountpoint.datasource;
+package com.tiromansev.filedialog.datasource;
 
 public interface LegacyFile {
   String getName();

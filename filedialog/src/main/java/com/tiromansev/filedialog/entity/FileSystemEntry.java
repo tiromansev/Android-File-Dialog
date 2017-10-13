@@ -1,4 +1,4 @@
-package com.library.mountpoint.entity;
+package com.tiromansev.filedialog.entity;
 
 import android.graphics.Color;
 import android.graphics.Paint;

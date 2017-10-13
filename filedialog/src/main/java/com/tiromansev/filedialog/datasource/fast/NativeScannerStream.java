@@ -1,11 +1,11 @@
-package com.library.mountpoint.datasource.fast;
+package com.tiromansev.filedialog.datasource.fast;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 
-import com.library.mountpoint.datasource.DataSource;
+import com.tiromansev.filedialog.datasource.DataSource;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,7 +63,7 @@ public class NativeScannerStream extends InputStream {
     }
 
     private NativeScannerStream runScanner(String root,
-        boolean rootRequired) throws IOException, InterruptedException {
+                                           boolean rootRequired) throws IOException, InterruptedException {
       String binaryName = "scan";
       final int sdkVersion = DataSource.get().getAndroidVersion();
       if (sdkVersion >= 21 /* Lollipop */) {
@@ -145,7 +145,7 @@ public class NativeScannerStream extends InputStream {
       process.waitFor();
     }
 
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    @TargetApi(VERSION_CODES.GINGERBREAD)
     private void setExecutable(String binaryName) {
       if (new File(binaryName).setExecutable(true, true) == false) {
         throw new RuntimeException("Failed to setExecutable");

@@ -1,14 +1,14 @@
-package com.library.mountpoint.datasource.fast;
+package com.tiromansev.filedialog.datasource.fast;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 
-import com.library.mountpoint.datasource.DataSource;
-import com.library.mountpoint.datasource.LegacyFile;
-import com.library.mountpoint.datasource.PortableFile;
-import com.library.mountpoint.datasource.StatFsSource;
+import com.tiromansev.filedialog.datasource.DataSource;
+import com.tiromansev.filedialog.datasource.LegacyFile;
+import com.tiromansev.filedialog.datasource.PortableFile;
+import com.tiromansev.filedialog.datasource.StatFsSource;
 
 import java.io.File;
 import java.io.FileInputStream;

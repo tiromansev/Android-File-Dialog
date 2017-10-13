@@ -1,1 +1,1 @@
-include ':app', ':filedialog', ':mountpoint'
+include ':app', ':filedialog'

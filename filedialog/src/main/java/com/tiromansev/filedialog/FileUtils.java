@@ -15,12 +15,12 @@ public class FileUtils {
         }
         else {
             if (!useOldFileDialog && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                for (com.library.mountpoint.MountPoint mountPoint : com.library.mountpoint.MountPoint.getMountPoints(context).values()) {
+                for (MountPoint mountPoint : MountPoint.getMountPoints(context).values()) {
                     mountPoints.add(new File(mountPoint.getRoot()).getAbsolutePath());
                 }
             }
             else {
-                mountPoints.addAll(com.library.mountpoint.MountPoint.getPreLollipopMountPoints());
+                mountPoints.addAll(MountPoint.getPreLollipopMountPoints());
             }
         }
         return mountPoints;
@@ -37,15 +37,15 @@ public class FileUtils {
             mountPoints.add(context.getResources().getString(R.string.caption_default));
         }
         if (!useOldFileDialog && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            for (com.library.mountpoint.MountPoint mountPoint : com.library.mountpoint.MountPoint.getMountPoints(context).values()) {
+            for (MountPoint mountPoint : MountPoint.getMountPoints(context).values()) {
                 String mountPath = new File(mountPoint.getRoot()).getAbsolutePath();
-                if (com.library.mountpoint.MountPoint.checkWriteMountPoint(mountPath + getAppDir(context))) {
+                if (MountPoint.checkWriteMountPoint(mountPath + getAppDir(context))) {
                     mountPoints.add(mountPath);
                 }
             }
         }
         else {
-            mountPoints.addAll(com.library.mountpoint.MountPoint.getPreLollipopMountPoints());
+            mountPoints.addAll(MountPoint.getPreLollipopMountPoints());
         }
         return mountPoints;
     }

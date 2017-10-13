@@ -1,9 +1,14 @@
-package com.library.mountpoint;
+package com.tiromansev.filedialog;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+
+import com.tiromansev.filedialog.datasource.DataSource;
+import com.tiromansev.filedialog.datasource.PortableFile;
+import com.tiromansev.filedialog.datasource.StatFsSource;
+import com.tiromansev.filedialog.entity.FileSystemEntry;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class MountPoint {
-  final com.library.mountpoint.entity.FileSystemEntry.ExcludeFilter excludeFilter;
+  final FileSystemEntry.ExcludeFilter excludeFilter;
   public String title;
   final String root;
   final boolean hasApps2SD;
@@ -22,7 +27,7 @@ public class MountPoint {
   final boolean forceHasApps;
   final String fsType;
 
-  MountPoint(String title, String root, com.library.mountpoint.entity.FileSystemEntry.ExcludeFilter excludeFilter,
+  MountPoint(String title, String root, FileSystemEntry.ExcludeFilter excludeFilter,
              boolean hasApps2SD, boolean rootRequired, String fsType, boolean forceHasApps) {
     this.title = title;
     this.root = root;
@@ -103,7 +108,7 @@ public class MountPoint {
   }
 
   public static String storageCardPath() {
-    com.library.mountpoint.datasource.PortableFile externalStorageDirectory = com.library.mountpoint.datasource.DataSource.get().getExternalStorageDirectory();
+    PortableFile externalStorageDirectory = DataSource.get().getExternalStorageDirectory();
     return externalStorageDirectory.getCanonicalPath();
   }
 
@@ -149,7 +154,7 @@ public class MountPoint {
     try {
       // FIXME: debug
       checksum = 0;
-      BufferedReader reader = com.library.mountpoint.datasource.DataSource.get().getProcReader();
+      BufferedReader reader = DataSource.get().getProcReader();
       String line;
       while ((line = reader.readLine()) != null) {
         checksum += line.length();
@@ -160,9 +165,9 @@ public class MountPoint {
         Log.d("diskusage", "Mount point: " + mountPoint);
         String fsType = parts[2];
 
-        com.library.mountpoint.datasource.StatFsSource stat = null;
+        StatFsSource stat = null;
         try {
-          stat = com.library.mountpoint.datasource.DataSource.get().statFs(mountPoint);
+          stat = DataSource.get().statFs(mountPoint);
         } catch (Exception e) {
         }
 
@@ -216,7 +221,7 @@ public class MountPoint {
           }
         }
         MountPoint newMountPoint = new MountPoint(
-            mountPoint.root, mountPoint.root, new com.library.mountpoint.entity.FileSystemEntry.ExcludeFilter(excludes),
+            mountPoint.root, mountPoint.root, new FileSystemEntry.ExcludeFilter(excludes),
             has_apps2sd, mountPoint.rootRequired, mountPoint.fsType, false);
         if (mountPoint.rootRequired) {
           rootedMountPoints.put(mountPoint.root, newMountPoint);
@@ -227,7 +232,7 @@ public class MountPoint {
     } catch (Exception e) {
       Log.e("diskusage", "Failed to get mount points", e);
     }
-    final int sdkVersion = com.library.mountpoint.datasource.DataSource.get().getAndroidVersion();
+    final int sdkVersion = DataSource.get().getAndroidVersion();
 
     try {
       addMediaPaths(context);
@@ -256,14 +261,14 @@ public class MountPoint {
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  private static com.library.mountpoint.datasource.PortableFile getBaseDir(com.library.mountpoint.datasource.PortableFile dir) {
+  private static PortableFile getBaseDir(PortableFile dir) {
     if (dir == null) {
       return null;
     }
 
     long totalSpace = dir.getTotalSpace();
     while (true) {
-      com.library.mountpoint.datasource.PortableFile base = com.library.mountpoint.datasource.DataSource.get().getParentFile(dir);
+      PortableFile base = DataSource.get().getParentFile(dir);
       try {
         base.isExternalStorageEmulated();
       } catch (Exception e) {
@@ -281,13 +286,13 @@ public class MountPoint {
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   private static void initMountPointsLollipop(Context context) {
     Map<String, MountPoint> mountPoints = new TreeMap<String, MountPoint>();
-    com.library.mountpoint.datasource.PortableFile defaultDir = getBaseDir(com.library.mountpoint.datasource.DataSource.get().getExternalFilesDir(context));
-    com.library.mountpoint.datasource.PortableFile[] dirs = com.library.mountpoint.datasource.DataSource.get().getExternalFilesDirs(context);
-    for (com.library.mountpoint.datasource.PortableFile path : dirs) {
+    PortableFile defaultDir = getBaseDir(DataSource.get().getExternalFilesDir(context));
+    PortableFile[] dirs = DataSource.get().getExternalFilesDirs(context);
+    for (PortableFile path : dirs) {
       if (path == null) {
         continue;
       }
-      com.library.mountpoint.datasource.PortableFile dir = getBaseDir(path);
+      PortableFile dir = getBaseDir(path);
       boolean isEmulated = false;
       boolean isRemovable = false;
       boolean hasApps = false;
@@ -301,7 +306,7 @@ public class MountPoint {
       MountPoint mountPoint = new MountPoint(
           dir.equals(defaultDir) ? titleStorageCard(context) : dir.getAbsolutePath(),
           dir.getAbsolutePath(),
-          new com.library.mountpoint.entity.FileSystemEntry.ExcludeFilter(new ArrayList<String>()),
+          new FileSystemEntry.ExcludeFilter(new ArrayList<String>()),
           false /* hasApps2SD */,
           false /* rootRequired */,
           "whoCares",
@@ -323,17 +328,17 @@ public class MountPoint {
   }
 
   @TargetApi(Build.VERSION_CODES.KITKAT)
-  public static com.library.mountpoint.datasource.PortableFile[] getMediaStoragePaths(Context context) {
+  public static PortableFile[] getMediaStoragePaths(Context context) {
     try {
-      return com.library.mountpoint.datasource.DataSource.get().getExternalFilesDirs(context);
+      return DataSource.get().getExternalFilesDirs(context);
     } catch (Throwable t) {
-      return new com.library.mountpoint.datasource.PortableFile[0];
+      return new PortableFile[0];
     }
   }
 
   private static void addMediaPaths(Context context) {
-    com.library.mountpoint.datasource.PortableFile[] mediaStoragePaths = getMediaStoragePaths(context);
-    for (com.library.mountpoint.datasource.PortableFile file : mediaStoragePaths) {
+    PortableFile[] mediaStoragePaths = getMediaStoragePaths(context);
+    for (PortableFile file : mediaStoragePaths) {
       while (file != null) {
         String canonical = file.getCanonicalPath();
 
@@ -353,7 +358,7 @@ public class MountPoint {
           break;
         }
         if (canonical.equals("/")) break;
-        file = com.library.mountpoint.datasource.DataSource.get().getParentFile(file);
+        file = DataSource.get().getParentFile(file);
       }
     }
   }

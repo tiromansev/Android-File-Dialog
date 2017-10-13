@@ -1,6 +1,6 @@
-package com.library.mountpoint.datasource.fast;
+package com.tiromansev.filedialog.datasource.fast;
 
-import com.library.mountpoint.datasource.LegacyFile;
+import com.tiromansev.filedialog.datasource.LegacyFile;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package com.library.mountpoint.datasource.fast;
+package com.tiromansev.filedialog.datasource.fast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

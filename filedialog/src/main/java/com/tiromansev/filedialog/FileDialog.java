@@ -144,7 +144,7 @@ public class FileDialog {
             include = true;
             path = mountPoints.get(i);
             for (String mountPoint: rootDirList) {
-                if (com.library.mountpoint.MountPoint.calcHash(mountPoint) == com.library.mountpoint.MountPoint.calcHash(path)) {
+                if (MountPoint.calcHash(mountPoint) == MountPoint.calcHash(path)) {
                     include = false;
                     break;
                 }
