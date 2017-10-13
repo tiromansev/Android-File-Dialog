@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">File dialog</string>
+    <string name="caption_default">default</string>
+    <string name="caption_ok">ОК</string>
+    <string name="message_file_must_be_selected">You need to select file!</string>
+    <string name="title_select_file">Select file</string>
+    <string name="caption_save_as">Save as</string>
+    <string name="caption_folder_select">Select folder</string>
+    <string name="caption_new_folder_name">Folder name</string>
+    <string name="text_new_folder_name">New folder name</string>
+    <string name="message_failed_to_create_folder">Error creating folder</string>
+    <string name="caption_cancel">Cancel</string>
+    <string name="message_write_permission_denied">Write permission denied!</string>
+    <string name="message_get_dir_content_error">Error getting folder content</string>
+    <string name="message_value_cannot_be_empty">Value cannot be empty</string>
 </resources>
