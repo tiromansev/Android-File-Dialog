@@ -194,7 +194,11 @@ public class FileDialog {
         this.fileDialogListener = fileDialogListener;
     }
 
-    protected void initRootDirList() {
+    protected void excludeRoot(String excludedRoot, String existingRoot) {
+
+    }
+
+    private void initRootDirList() {
         rootDirList.clear();
         List<String> mountPoints = FileUtils.getMountPoints(context, selectType != FILE_OPEN, useOldFileDialog);
         boolean include;
@@ -204,6 +208,7 @@ public class FileDialog {
             path = mountPoints.get(i);
             for (String mountPoint: rootDirList) {
                 if (MountPoint.calcHash(mountPoint) == MountPoint.calcHash(path)) {
+                    excludeRoot(path, mountPoint);
                     include = false;
                     break;
                 }
