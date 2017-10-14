@@ -35,7 +35,7 @@ public class FileDialog {
 	public static final int FOLDER_CHOOSE = 2;
 	private int selectType = FILE_OPEN;
 
-    private String filterFileExt;
+    private String[] filterFileExt;
 	private String sdcardDirectory = "";
 	private Activity context;
 	private String selectedFileName = "";
@@ -98,7 +98,7 @@ public class FileDialog {
 		void onChosenDir(String chosenDir);
 	}
 
-    public String getFilterFileExt() {
+    public String[] getFilterFileExt() {
         return filterFileExt;
     }
 
@@ -106,7 +106,7 @@ public class FileDialog {
         this.fileIcons = fileIcons;
     }
 
-    public void setFilterFileExt(String filterFileExt) {
+    public void setFilterFileExt(String[] filterFileExt) {
         this.filterFileExt = filterFileExt;
     }
 
@@ -406,10 +406,16 @@ public class FileDialog {
                             browserDirectoryLockImageId, file.getName());
                     dirs.add(item);
 				} else if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
-                    if (filterFileExt != null) {
-                        if (!file.getName().endsWith(filterFileExt)) {
-                            continue;
+                    boolean exclude = false;
+                    if (filterFileExt != null && filterFileExt.length > 0) {
+                        for (String filter: filterFileExt) {
+                            if (!file.getName().endsWith(filter)) {
+                                exclude = true;
+                            }
                         }
+                    }
+                    if (exclude) {
+                        continue;
                     }
                     RowItem item = null;
                     if (fileIcons.size() > 0) {
@@ -664,7 +670,7 @@ public class FileDialog {
             return this;
         }
 
-        public Builder setFilterFileExt(String filterFileExt) {
+        public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.filterFileExt = filterFileExt;
             return this;
         }
