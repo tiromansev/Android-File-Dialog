@@ -110,7 +110,7 @@ public class FileDialog {
         this.filterFileExt = filterFileExt;
     }
 
-    private class RowItem {
+    public class RowItem {
         private final int imageId;
         private final String title;
 
