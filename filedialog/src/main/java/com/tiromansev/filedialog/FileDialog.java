@@ -430,6 +430,7 @@ public class FileDialog {
                             if (file.getName().endsWith(entry.getKey())) {
                                 item = new RowItem(entry.getValue(), file.getName());
                                 files.add(item);
+                                break;
                             }
                         }
                     }
