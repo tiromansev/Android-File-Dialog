@@ -2,6 +2,7 @@
     <string name="caption_default">default</string>
     <string name="caption_ok">ОК</string>
     <string name="message_file_must_be_selected">You need to select file!</string>
+    <string name="message_directory_must_be_selected">You need to select directory!</string>
     <string name="title_select_file">Select file</string>
     <string name="caption_save_as">Save as</string>
     <string name="caption_folder_select">Select folder</string>

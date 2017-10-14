@@ -335,7 +335,12 @@ public class FileDialog {
                                     GuiUtils.showMessage(context, R.string.message_file_must_be_selected);
                                 }
                             } else {
-                                fileDialogListener.onChosenDir(currentDir);
+                                if (selectedFileName.length() > 0) {
+                                    fileDialogListener.onChosenDir(currentDir);
+                                }
+                                else {
+                                    GuiUtils.showMessage(context, R.string.message_directory_must_be_selected);
+                                }
                             }
                         }
                     }

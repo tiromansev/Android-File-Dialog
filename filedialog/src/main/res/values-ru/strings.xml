@@ -2,6 +2,7 @@
     <string name="caption_default">по умолчанию</string>
     <string name="caption_ok">ОК</string>
     <string name="message_file_must_be_selected">Необходимо выбрать файл!</string>
+    <string name="message_directory_must_be_selected">Необходимо выбрать папку!</string>
     <string name="title_select_file">Выбрать файл</string>
     <string name="caption_save_as">Сохранить как</string>
     <string name="caption_folder_select">Выбрать папку</string>
