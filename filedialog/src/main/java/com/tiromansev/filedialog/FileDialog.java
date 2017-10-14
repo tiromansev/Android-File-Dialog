@@ -98,6 +98,10 @@ public class FileDialog {
 		void onChosenDir(String chosenDir);
 	}
 
+    public String getFilterFileExt() {
+        return filterFileExt;
+    }
+
     public void setFileIcons(HashMap<String, Integer> fileIcons) {
         this.fileIcons = fileIcons;
     }
