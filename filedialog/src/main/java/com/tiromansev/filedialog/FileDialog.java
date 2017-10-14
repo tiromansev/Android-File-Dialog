@@ -37,7 +37,7 @@ public class FileDialog {
 
     private String filterFileExt;
 	private String sdcardDirectory = "";
-	private final Activity context;
+	private Activity context;
 	private String selectedFileName = "";
     private boolean canExplore = true;
     private List<String> rootDirList = new ArrayList<>();
@@ -46,60 +46,60 @@ public class FileDialog {
 	private FileDialogListener fileDialogListener = null;
 	private ArrayAdapter<RowItem> listAdapter = null;
     private HorizontalScrollView scrollView;
-    private static Comparator<RowItem> directoryComparator;
-    private static Comparator<RowItem> fileComparator;
-    private static boolean useOldFileDialog = false;
-    private static HashMap<String, Integer> fileIcons = new HashMap<>();
+    private Comparator<RowItem> directoryComparator;
+    private Comparator<RowItem> fileComparator;
+    private boolean useOldFileDialog = false;
+    private HashMap<String, Integer> fileIcons = new HashMap<>();
 
-    private static int addDirectoryImageId = R.mipmap.ic_add_folder;
-    private static int browserDirectoryImageId = R.mipmap.ic_browser_folder;
-    private static int browserDirectoryLockImageId = R.mipmap.ic_browser_folder_lock;
-    private static int browserDirectoryUpImageId = R.mipmap.ic_browser_folder_up;
-    private static int fileImageId = R.mipmap.ic_file;
-    private static int sdStorageImageId = R.mipmap.ic_sd_storage;
+    private int addDirectoryImageId = R.mipmap.ic_add_folder;
+    private int browserDirectoryImageId = R.mipmap.ic_browser_folder;
+    private int browserDirectoryLockImageId = R.mipmap.ic_browser_folder_lock;
+    private int browserDirectoryUpImageId = R.mipmap.ic_browser_folder_up;
+    private int fileImageId = R.mipmap.ic_file;
+    private int sdStorageImageId = R.mipmap.ic_sd_storage;
 
-    public static void setAddDirectoryImageId(int addDirectoryImageId) {
-        FileDialog.addDirectoryImageId = addDirectoryImageId;
+    public void setAddDirectoryImageId(int addDirectoryImageId) {
+        this.addDirectoryImageId = addDirectoryImageId;
     }
 
-    public static void setBrowserDirectoryImageId(int browserDirectoryImageId) {
-        FileDialog.browserDirectoryImageId = browserDirectoryImageId;
+    public void setBrowserDirectoryImageId(int browserDirectoryImageId) {
+        this.browserDirectoryImageId = browserDirectoryImageId;
     }
 
-    public static void setBrowserDirectoryLockImageId(int browserDirectoryLockImageId) {
-        FileDialog.browserDirectoryLockImageId = browserDirectoryLockImageId;
+    public void setBrowserDirectoryLockImageId(int browserDirectoryLockImageId) {
+        this.browserDirectoryLockImageId = browserDirectoryLockImageId;
     }
 
-    public static void setBrowserDirectoryUpImageId(int browserDirectoryUpImageId) {
-        FileDialog.browserDirectoryUpImageId = browserDirectoryUpImageId;
+    public void setBrowserDirectoryUpImageId(int browserDirectoryUpImageId) {
+        this.browserDirectoryUpImageId = browserDirectoryUpImageId;
     }
 
-    public static void setFileImageId(int fileImageId) {
-        FileDialog.fileImageId = fileImageId;
+    public void setFileImageId(int fileImageId) {
+        this.fileImageId = fileImageId;
     }
 
-    public static void setSdStorageImageId(int sdStorageImageId) {
-        FileDialog.sdStorageImageId = sdStorageImageId;
+    public void setSdStorageImageId(int sdStorageImageId) {
+        this.sdStorageImageId = sdStorageImageId;
     }
 
-    public static void setDirectoryComparator(Comparator<RowItem> directoryComparator) {
-        FileDialog.directoryComparator = directoryComparator;
+    public void setDirectoryComparator(Comparator<RowItem> directoryComparator) {
+        this.directoryComparator = directoryComparator;
     }
 
-    public static void setFileComparator(Comparator<RowItem> fileComparator) {
-        FileDialog.fileComparator = fileComparator;
+    public void setFileComparator(Comparator<RowItem> fileComparator) {
+        this.fileComparator = fileComparator;
     }
 
     public void setUseOldFileDialog(boolean useOldFileDialog) {
-        FileDialog.useOldFileDialog = useOldFileDialog;
+        this.useOldFileDialog = useOldFileDialog;
     }
 
     public interface FileDialogListener {
 		void onChosenDir(String chosenDir);
 	}
 
-    public static void setFileIcons(HashMap<String, Integer> fileIcons) {
-        FileDialog.fileIcons = fileIcons;
+    public void setFileIcons(HashMap<String, Integer> fileIcons) {
+        this.fileIcons = fileIcons;
     }
 
     public void setFilterFileExt(String filterFileExt) {
@@ -127,6 +127,10 @@ public class FileDialog {
         public String toString() {
             return title;
         }
+    }
+
+    public FileDialog() {
+
     }
 
     public FileDialog(Activity context) {
