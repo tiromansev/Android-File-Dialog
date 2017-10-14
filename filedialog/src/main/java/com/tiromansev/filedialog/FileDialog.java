@@ -659,7 +659,7 @@ public class FileDialog {
 
 	public class Builder {
 
-        private Builder() {
+        public Builder() {
 
         }
 
