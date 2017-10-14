@@ -413,9 +413,11 @@ public class FileDialog {
 				} else if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
                     boolean exclude = false;
                     if (filterFileExt != null && filterFileExt.length > 0) {
+                        exclude = true;
                         for (String filter: filterFileExt) {
-                            if (!file.getName().endsWith(filter)) {
-                                exclude = true;
+                            if (file.getName().endsWith(filter)) {
+                                exclude = false;
+                                break;
                             }
                         }
                     }
