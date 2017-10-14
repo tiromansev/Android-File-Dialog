@@ -1,0 +1,27 @@
+<resources>
+    <string name="caption_default">по умолчанию</string>
+    <string name="caption_ok">ОК</string>
+    <string name="message_file_must_be_selected">Необходимо выбрать файл!</string>
+    <string name="title_select_file">Выбрать файл</string>
+    <string name="caption_save_as">Сохранить как</string>
+    <string name="caption_folder_select">Выбрать папку</string>
+    <string name="caption_new_folder_name">Имя папки</string>
+    <string name="text_new_folder_name">Имя новой папки</string>
+    <string name="message_failed_to_create_folder">Ошибка создания папки</string>
+    <string name="caption_cancel">Отмена</string>
+    <string name="message_write_permission_denied">Отсутствует доступ на запись!</string>
+    <string name="message_get_dir_content_error">Обнаружена ошибка получения содержимого папки</string>
+    <string name="message_value_cannot_be_empty">Значение не может быть пустым</string>
+    <string name="n_bytes">%d bytes</string>
+    <string name="n_kilobytes">%d KiB</string>
+    <string name="n_megabytes">%5.2f MiB</string>
+    <string name="n_megabytes10">%5.1f MiB</string>
+    <string name="n_megabytes100">%d MiB</string>
+    <string name="n_gigabytes">%5.2f GiB</string>
+    <string name="n_gigabytes10">%5.1f GiB</string>
+    <string name="n_gigabytes100">%d GiB</string>
+    <string name="dir_name_size_num_dirs">%1$s (%2$s, %3$d dirs)</string>
+    <string name="dir_empty">%s (empty)</string>
+    <string name="dir_name_size">%1$s (%2$s)</string>
+    <string name="storage_card">Storage card</string>
+</resources>

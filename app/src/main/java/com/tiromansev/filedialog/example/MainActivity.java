@@ -19,19 +19,17 @@ public class MainActivity extends AppCompatActivity {
         btnOpenDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileDialog dialog = new FileDialog(
-                        MainActivity.this,
-                        FileDialog.FILE_OPEN,
-                        true,
-                        false,
-                        new FileDialog.SimpleFileDialogListener() {
+                FileDialog.create(MainActivity.this)
+                        .setCanExplore(true)
+                        .setSelectType(FileDialog.FILE_OPEN)
+                        .setFileDialogListener(new FileDialog.FileDialogListener() {
                             @Override
                             public void onChosenDir(String chosenDir) {
                                 Toast.makeText(MainActivity.this, chosenDir, Toast.LENGTH_LONG).show();
                             }
-                        }
-                );
-                dialog.chooseFileOrDir(getExternalFilesDir(null).getAbsolutePath());
+                        })
+                        .build()
+                        .show(getExternalFilesDir(null).getAbsolutePath());
             }
         });
     }
