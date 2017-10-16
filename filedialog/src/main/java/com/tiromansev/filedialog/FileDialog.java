@@ -144,6 +144,7 @@ public class FileDialog {
             @Override
             public boolean onItemSelect(String itemTag) {
                 if (!itemTag.equals(currentDir)) {
+                    String oldDir = currentDir;
                     if (itemTag.equals(String.valueOf(UNDEFINED_VALUE))) {
                         scrollView.setVisibility(View.GONE);
                         currentDir = "";
@@ -151,8 +152,13 @@ public class FileDialog {
                         scrollView.setVisibility(View.VISIBLE);
                         currentDir = itemTag;
                     }
-                    updateDirectory();
-                    return true;
+                    if (updateDirectory()) {
+                        return true;
+                    }
+                    else {
+                        currentDir = oldDir;
+                        return false;
+                    }
                 }
                 return false;
             }
@@ -298,14 +304,18 @@ public class FileDialog {
 	// //////////////////////////////////////////////////////////////////////////////
     private void choose(String dir) {
 		File dirFile = new File(dir);
-        currentDir = dir;
 
 		if (!dirFile.exists() || !dirFile.isDirectory()) {
             showRootDir();
 		}
         else {
-            subDirectories = getDirectories(dir);
+            List<RowItem> directories = getDirectories(dir);
+            if (directories == null) {
+                return;
+            }
+            subDirectories = directories;
         }
+        currentDir = dir;
 
 		class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener {
 			public void onClick(DialogInterface dialog, int item) {
@@ -389,7 +399,7 @@ public class FileDialog {
 	private List<RowItem> getDirectories(String dir) {
 		List<RowItem> dirs = new ArrayList<>();
         List<RowItem> files = new ArrayList<>();
-        List<RowItem> result = new ArrayList<>();
+        List<RowItem> result;
 
 		try {
 			File dirFile = new File(dir);
@@ -443,11 +453,13 @@ public class FileDialog {
 		} catch (Exception e) {
             e.printStackTrace();
             GuiUtils.showMessage(context, R.string.message_get_dir_content_error);
+            return null;
 		}
 
 		Collections.sort(dirs, directoryComparator);
 		Collections.sort(files, fileComparator);
 
+        result = new ArrayList<>();
         result.addAll(dirs);
         result.addAll(files);
 		return result;
@@ -575,15 +587,19 @@ public class FileDialog {
         }
     }
 
-	private void updateDirectory() {
-        subDirectories.clear();
-		String fileName = "";
+	private boolean updateDirectory() {
         if (currentDir == null || currentDir.isEmpty()) {
             showRootDir();
         }
         else {
-            subDirectories.addAll(getDirectories(currentDir));
+            List<RowItem> directories = getDirectories(currentDir);
+            if (directories == null) {
+                return false;
+            }
+            subDirectories.clear();
+            subDirectories.addAll(directories);
         }
+        String fileName = "";
 		// #scorch
 		if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
 			fileName = selectedFileName;
@@ -593,6 +609,7 @@ public class FileDialog {
             getBreadCrumb();
         }
 		listAdapter.notifyDataSetChanged();
+        return true;
 	}
 
     private class ViewHolder {
