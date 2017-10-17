@@ -36,7 +36,6 @@ public class FileDialog {
 	private int selectType = FILE_OPEN;
 
     private String[] filterFileExt;
-	private String sdcardDirectory = "";
 	private Activity context;
 	private String selectedFileName = "";
     private boolean canExplore = true;
@@ -145,7 +144,12 @@ public class FileDialog {
             public boolean onItemSelect(String itemTag) {
                 if (!itemTag.equals(currentDir)) {
                     String oldDir = currentDir;
-                    if (itemTag.equals(String.valueOf(UNDEFINED_VALUE))) {
+                    //check we go to root dir
+                    String rootDirContains = getRootDirContains(itemTag);
+                    if (rootDirContains != null) {
+                        currentDir = "";
+                    }
+                    else if (itemTag.equals(String.valueOf(UNDEFINED_VALUE))) {
                         scrollView.setVisibility(View.GONE);
                         currentDir = "";
                     } else {
@@ -229,7 +233,7 @@ public class FileDialog {
 		// Initial directory is sdcard directory
         File initDir = new File(dir);
         if ((dir.equals("")) || (!initDir.exists()))
-            choose(sdcardDirectory);
+            choose("");
         else {
             choose(dir);
         }
@@ -248,6 +252,15 @@ public class FileDialog {
     private String getRootDir(String dir) {
         for (String rootDir: rootDirList) {
             if (rootDir.equals(dir)) {
+                return rootDir;
+            }
+        }
+        return null;
+    }
+
+    private String getRootDirContains(String dir) {
+        for (String rootDir: rootDirList) {
+            if (dir.length() < rootDir.length() && rootDir.contains(dir)) {
                 return rootDir;
             }
         }
@@ -401,16 +414,8 @@ public class FileDialog {
         List<RowItem> files = new ArrayList<>();
         List<RowItem> result;
 
-		try {
-			File dirFile = new File(dir);
-
-			// if directory is not the base sd card directory add ".." for going
-			// up one directory
-			if (!currentDir.equals(sdcardDirectory) && canExplore) {
-                RowItem item = new RowItem(browserDirectoryUpImageId, "..");
-                dirs.add(item);
-            }
-
+        File dirFile = new File(dir);
+        try {
 			if (!dirFile.exists() || !dirFile.isDirectory()) {
 				return dirs;
 			}
@@ -460,6 +465,9 @@ public class FileDialog {
 		Collections.sort(files, fileComparator);
 
         result = new ArrayList<>();
+        if (dirFile.getParentFile() != null && canExplore) {
+            result.add(new RowItem(browserDirectoryUpImageId, ".."));
+        }
         result.addAll(dirs);
         result.addAll(files);
 		return result;
