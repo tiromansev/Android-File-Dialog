@@ -83,6 +83,7 @@ public class BreadCrumbs {
     public void detachFrom() {
         removeViews();
         this.parent = null;
+        itemClickListener = null;
     }
 
     public void addHomeItem(String itemTag) {
