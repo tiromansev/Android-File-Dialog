@@ -69,14 +69,19 @@ public class BreadCrumbs {
 
     public void attachTo(HorizontalScrollView parent) {
         this.parent = parent;
-        if (toolbar.getParent() != null) {
-            ((HorizontalScrollView) toolbar.getParent()).removeView(toolbar);
-        }
+        removeViews();
         this.parent.setBackgroundColor(context.getResources().getColor(R.color.bread_crumbs_color));
         this.parent.addView(toolbar);
     }
 
+    private void removeViews() {
+        if (toolbar.getParent() != null) {
+            ((HorizontalScrollView) toolbar.getParent()).removeView(toolbar);
+        }
+    }
+
     public void detachFrom() {
+        removeViews();
         this.parent = null;
     }
 
