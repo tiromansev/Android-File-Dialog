@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.tiromansev.filedialog.example"
         minSdkVersion 15
@@ -19,7 +18,7 @@ android {
     }
 }
 
-def support = '25.3.1'
+def support = '26.1.0'
 
 dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
