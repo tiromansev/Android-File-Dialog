@@ -339,6 +339,12 @@ public class FileDialog {
 
 		AlertDialog.Builder dialogBuilder = createDirectoryChooserDialog(
                 subDirectories, new SimpleFileDialogOnClickListener());
+		dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                breadCrumbs.detachFrom();
+            }
+        });
         String okCaption = context.getResources().getString(R.string.caption_ok);
 
 		dialogBuilder.setPositiveButton(
@@ -389,6 +395,7 @@ public class FileDialog {
                                     return;
                                 }
                                 fileDialogListener.onChosenDir(currentDir + "/" + selectedFileName);
+                                breadCrumbs.detachFrom();
                                 dirsDialog.dismiss();
                             } else {
                                 if (!parentDir.canWrite()) {
@@ -396,6 +403,7 @@ public class FileDialog {
                                     return;
                                 }
                                 fileDialogListener.onChosenDir(currentDir);
+                                breadCrumbs.detachFrom();
                                 dirsDialog.dismiss();
                             }
                         }

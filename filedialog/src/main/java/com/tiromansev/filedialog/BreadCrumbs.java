@@ -170,6 +170,9 @@ public class BreadCrumbs {
     }
 
     public void lastItemClick() {
+        if (itemClickListener == null) {
+            return;
+        }
         if (getToolbar() != null && getToolbar().getVisibility() == View.VISIBLE) {
             View lastView = getLastView();
             if (lastView != null) {
