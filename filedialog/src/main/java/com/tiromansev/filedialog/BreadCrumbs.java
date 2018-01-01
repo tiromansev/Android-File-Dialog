@@ -232,7 +232,7 @@ public class BreadCrumbs {
         }
     }
 
-    public void saveState(Bundle outState, String tag) {
+    public HashMap<String, Integer> getItems() {
         HashMap<String, Integer> saveItems = new HashMap<>();
         if (!items.isEmpty()) {
             for (Map.Entry<View, Integer> entry: items.entrySet()) {
@@ -242,14 +242,18 @@ public class BreadCrumbs {
                 }
             }
         }
-        outState.putSerializable(tag, saveItems);
+        return saveItems;
+    }
+
+    public void saveState(Bundle outState, String tag) {
+        outState.putSerializable(tag, getItems());
     }
 
     public void saveState(Bundle outState) {
         saveState(outState, ITEMS);
     }
 
-    private void restoreItems(HashMap<String, Integer> restoreItems) {
+    private void setItems(HashMap<String, Integer> restoreItems) {
         if (!restoreItems.isEmpty()) {
             Map<String, Integer> sortedItems = new TreeMap<>(restoreItems);
             Set<Map.Entry<String, Integer>> set = sortedItems.entrySet();
@@ -265,7 +269,7 @@ public class BreadCrumbs {
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
             HashMap<String, Integer> restoreItems = (HashMap<String, Integer>) inState.getSerializable(tag);
-            restoreItems(restoreItems);
+            setItems(restoreItems);
         }
     }
 
