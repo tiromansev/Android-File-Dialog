@@ -253,7 +253,7 @@ public class BreadCrumbs {
         saveState(outState, ITEMS);
     }
 
-    private void setItems(HashMap<String, Integer> restoreItems) {
+    public void setItems(HashMap<String, Integer> restoreItems) {
         if (!restoreItems.isEmpty()) {
             Map<String, Integer> sortedItems = new TreeMap<>(restoreItems);
             Set<Map.Entry<String, Integer>> set = sortedItems.entrySet();
