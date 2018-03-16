@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ public class FileDialog {
     private Comparator<RowItem> fileComparator;
     private boolean useOldFileDialog = false;
     private HashMap<String, Integer> fileIcons = new HashMap<>();
+    private boolean addModifiedDate = false;
 
     private int addDirectoryImageId = R.mipmap.ic_add_folder;
     private int browserDirectoryImageId = R.mipmap.ic_browser_folder;
@@ -451,7 +453,12 @@ public class FileDialog {
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
                             if (file.getName().endsWith(entry.getKey())) {
-                                item = new RowItem(entry.getValue(), file.getName());
+                                String fileName = file.getName();
+                                if (addModifiedDate) {
+                                    Date lastModDate = new Date(file.lastModified());
+                                    fileName = fileName.concat(" ").concat(lastModDate.toString());
+                                }
+                                item = new RowItem(entry.getValue(), fileName);
                                 files.add(item);
                                 break;
                             }
@@ -703,6 +710,11 @@ public class FileDialog {
 
         public Builder setCanExplore(boolean mCanExplore) {
             FileDialog.this.canExplore = mCanExplore;
+            return this;
+        }
+
+        public Builder setAddModifiedDate(boolean add) {
+            FileDialog.this.addModifiedDate = add;
             return this;
         }
 

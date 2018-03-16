@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
                 FileDialog.create(MainActivity.this)
                         .setCanExplore(true)
                         .setSelectType(FileDialog.FILE_OPEN)
+                        .setAddModifiedDate(true)
                         .setFileDialogListener(new FileDialog.FileDialogListener() {
                             @Override
                             public void onChosenDir(String chosenDir) {
