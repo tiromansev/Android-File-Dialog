@@ -17,12 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.tiromansev.filedialog.BreadCrumbs.UNDEFINED_VALUE;
@@ -453,7 +455,8 @@ public class FileDialog {
                     String fileName = file.getName();
                     if (addModifiedDate) {
                         Date lastModDate = new Date(file.lastModified());
-                        fileName = fileName.concat(" ").concat(lastModDate.toString());
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm", Locale.ENGLISH);
+                        fileName = fileName.concat(" -- ").concat(dateFormat.format(lastModDate));
                     }
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
