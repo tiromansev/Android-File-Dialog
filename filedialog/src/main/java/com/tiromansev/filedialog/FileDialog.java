@@ -450,14 +450,14 @@ public class FileDialog {
                         continue;
                     }
                     RowItem item = null;
+                    String fileName = file.getName();
+                    if (addModifiedDate) {
+                        Date lastModDate = new Date(file.lastModified());
+                        fileName = fileName.concat(" ").concat(lastModDate.toString());
+                    }
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
                             if (file.getName().endsWith(entry.getKey())) {
-                                String fileName = file.getName();
-                                if (addModifiedDate) {
-                                    Date lastModDate = new Date(file.lastModified());
-                                    fileName = fileName.concat(" ").concat(lastModDate.toString());
-                                }
                                 item = new RowItem(entry.getValue(), fileName);
                                 files.add(item);
                                 break;
@@ -465,7 +465,7 @@ public class FileDialog {
                         }
                     }
                     if (item == null) {
-                        item = new RowItem(fileImageId, file.getName());
+                        item = new RowItem(fileImageId, fileName);
                         files.add(item);
                     }
 				}
