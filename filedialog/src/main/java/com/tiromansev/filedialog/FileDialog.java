@@ -116,10 +116,12 @@ public class FileDialog {
     public class RowItem {
         private final int imageId;
         private final String title;
+        private final String data;
 
-        public RowItem(int imageId, String title) {
+        public RowItem(int imageId, String title, String data) {
             this.imageId = imageId;
             this.title = title;
+            this.data = data;
         }
 
         public int getImageId() {
@@ -128,6 +130,10 @@ public class FileDialog {
 
         public String getTitle() {
             return title;
+        }
+
+        public String getData() {
+            return data;
         }
 
         @Override
@@ -249,7 +255,7 @@ public class FileDialog {
         }
         subDirectories.clear();
         for (String rootDir: rootDirList) {
-            subDirectories.add(new RowItem(sdStorageImageId, new File(rootDir).getAbsolutePath()));
+            subDirectories.add(new RowItem(sdStorageImageId, new File(rootDir).getAbsolutePath(), null));
         }
     }
 
@@ -435,7 +441,7 @@ public class FileDialog {
 			for (File file : dirFile.listFiles()) {
 				if (file.isDirectory() && canExplore) {
                     RowItem item = new RowItem(file.canWrite() ? browserDirectoryImageId :
-                            browserDirectoryLockImageId, file.getName());
+                            browserDirectoryLockImageId, file.getName(), null);
                     dirs.add(item);
 				} else if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
                     boolean exclude = false;
@@ -452,23 +458,23 @@ public class FileDialog {
                         continue;
                     }
                     RowItem item = null;
-                    String fileName = file.getName();
+                    String data = null;
                     if (addModifiedDate) {
                         Date lastModDate = new Date(file.lastModified());
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm", Locale.ENGLISH);
-                        fileName = fileName.concat(" -- ").concat(dateFormat.format(lastModDate));
+                        data = dateFormat.format(lastModDate);
                     }
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
                             if (file.getName().endsWith(entry.getKey())) {
-                                item = new RowItem(entry.getValue(), fileName);
+                                item = new RowItem(entry.getValue(), file.getName(), data);
                                 files.add(item);
                                 break;
                             }
                         }
                     }
                     if (item == null) {
-                        item = new RowItem(fileImageId, fileName);
+                        item = new RowItem(fileImageId, file.getName(), data);
                         files.add(item);
                     }
 				}
@@ -484,7 +490,7 @@ public class FileDialog {
 
         result = new ArrayList<>();
         if (dirFile.getParentFile() != null && canExplore) {
-            result.add(new RowItem(browserDirectoryUpImageId, ".."));
+            result.add(new RowItem(browserDirectoryUpImageId, "..", null));
         }
         result.addAll(dirs);
         result.addAll(files);
@@ -641,6 +647,7 @@ public class FileDialog {
     private class ViewHolder {
         ImageView imageView;
         TextView txtTitle;
+        TextView txtData;
     }
 
 	private ArrayAdapter<RowItem> createListAdapter(List<RowItem> items) {
@@ -659,6 +666,7 @@ public class FileDialog {
                     convertView = mInflater.inflate(R.layout.view_file_dialog_item, null);
                     holder = new ViewHolder();
                     holder.txtTitle = (TextView) convertView.findViewById(R.id.tvFileItem);
+                    holder.txtData = (TextView) convertView.findViewById(R.id.tvFileData);
                     holder.imageView = (ImageView) convertView.findViewById(R.id.ivFileImage);
                     convertView.setTag(holder);
                 } else {
@@ -667,6 +675,7 @@ public class FileDialog {
 
                 rlDirItem = (RelativeLayout) convertView.findViewById(R.id.rlDirItem);
                 holder.txtTitle.setText(rowItem.getTitle());
+                holder.txtData.setText(rowItem.getData());
                 int bottomToolbarHeight = (int) context.getResources().getDimension(R.dimen.bottom_toolbar_height);
                 int dialogMargin = (int) context.getResources().getDimension(R.dimen.dialog_margin);
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(

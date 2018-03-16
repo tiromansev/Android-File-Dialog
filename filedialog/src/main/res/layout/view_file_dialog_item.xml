@@ -17,16 +17,29 @@
         android:layout_centerVertical="true" />
 
     <TextView
+        android:id="@+id/tvFileItem"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:gravity="center_vertical"
-        android:id="@+id/tvFileItem"
         android:layout_alignParentTop="false"
-        android:layout_toRightOf="@+id/ivFileImage"
         android:layout_centerVertical="true"
-        android:paddingLeft="@dimen/text_margin"
+        android:layout_toLeftOf="@+id/tvFileData"
+        android:layout_toRightOf="@+id/ivFileImage"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingLeft="@dimen/text_margin"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvFileData"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="false"
+        android:layout_centerVertical="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
