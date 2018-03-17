@@ -3,6 +3,7 @@ package com.tiromansev.filedialog;
 import android.content.Context;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +13,12 @@ public class FileUtils {
         List<String> mountPoints = new ArrayList<>();
         if (checkWritable) {
             mountPoints.addAll(getWritableMountPoints(context, false, useOldFileDialog));
-        }
-        else {
+        } else {
             if (!useOldFileDialog && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 for (MountPoint mountPoint : MountPoint.getMountPoints(context).values()) {
                     mountPoints.add(new File(mountPoint.getRoot()).getAbsolutePath());
                 }
-            }
-            else {
+            } else {
                 mountPoints.addAll(MountPoint.getPreLollipopMountPoints());
             }
         }
@@ -43,11 +42,35 @@ public class FileUtils {
                     mountPoints.add(mountPath);
                 }
             }
-        }
-        else {
+        } else {
             mountPoints.addAll(MountPoint.getPreLollipopMountPoints());
         }
         return mountPoints;
+    }
+
+    public static String size(long size) {
+        String hrSize = "";
+        double k = size / 1024;
+        double m = size / 1048576;
+        double g = size / 1073741824;
+
+        DecimalFormat dec = new DecimalFormat("0.00");
+
+        if (k > 0) {
+
+            hrSize = dec.format(k).concat(" k ");
+
+        }
+        if (m > 0) {
+
+            hrSize = dec.format(m).concat(" M ");
+        }
+        if (g > 0) {
+
+            hrSize = dec.format(g).concat(" G ");
+        }
+
+        return hrSize;
     }
 
 }

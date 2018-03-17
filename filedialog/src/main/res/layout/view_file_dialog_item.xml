@@ -16,30 +16,36 @@
         android:scaleType="centerInside"
         android:layout_centerVertical="true" />
 
-    <TextView
-        android:id="@+id/tvFileItem"
+    <LinearLayout
+        android:id="@+id/lItem"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="false"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/tvFileData"
-        android:layout_toRightOf="@+id/ivFileImage"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:paddingLeft="@dimen/text_margin"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/tvFileData"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/bottom_toolbar_height"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
-        android:layout_centerVertical="true"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_marginLeft="@dimen/text_margin"
+        android:layout_toEndOf="@+id/ivFileImage"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvFileItem"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="left|center_vertical"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="@dimen/item_font_size" />
+
+        <TextView
+            android:id="@+id/tvFileData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:ellipsize="end"
+            android:gravity="right|center_vertical"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="@dimen/data_font_size" />
+    </LinearLayout>
 
 </RelativeLayout>

@@ -3,6 +3,7 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -386,6 +388,9 @@ public class FileDialog {
                 });
 
 		final AlertDialog dirsDialog = dialogBuilder.create();
+        ListView listView = dirsDialog.getListView();
+        listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.button_focused_color_start))); // set color
+        listView.setDividerHeight(1); // set height
 
 		// Show directory chooser dialog
 		dirsDialog.show();
@@ -460,9 +465,10 @@ public class FileDialog {
                     RowItem item = null;
                     String data = null;
                     if (addModifiedDate) {
+                        data = FileUtils.size(file.length());
                         Date lastModDate = new Date(file.lastModified());
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm", Locale.ENGLISH);
-                        data = dateFormat.format(lastModDate);
+                        data += dateFormat.format(lastModDate);
                     }
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
@@ -665,24 +671,18 @@ public class FileDialog {
                 if (convertView == null) {
                     convertView = mInflater.inflate(R.layout.view_file_dialog_item, null);
                     holder = new ViewHolder();
-                    holder.txtTitle = (TextView) convertView.findViewById(R.id.tvFileItem);
-                    holder.txtData = (TextView) convertView.findViewById(R.id.tvFileData);
-                    holder.imageView = (ImageView) convertView.findViewById(R.id.ivFileImage);
+                    holder.txtTitle = convertView.findViewById(R.id.tvFileItem);
+                    holder.txtData = convertView.findViewById(R.id.tvFileData);
+                    holder.imageView = convertView.findViewById(R.id.ivFileImage);
                     convertView.setTag(holder);
                 } else {
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                rlDirItem = (RelativeLayout) convertView.findViewById(R.id.rlDirItem);
+                rlDirItem = convertView.findViewById(R.id.rlDirItem);
                 holder.txtTitle.setText(rowItem.getTitle());
                 holder.txtData.setText(rowItem.getData());
-                int bottomToolbarHeight = (int) context.getResources().getDimension(R.dimen.bottom_toolbar_height);
-                int dialogMargin = (int) context.getResources().getDimension(R.dimen.dialog_margin);
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        bottomToolbarHeight);
-                layoutParams.setMargins(dialogMargin, 0, 0, 0);
-                holder.txtTitle.setLayoutParams(layoutParams);
+                holder.txtData.setVisibility(rowItem.getData() != null ? View.VISIBLE : View.GONE);
                 holder.imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 if (rowItem.getImageId() != UNDEFINED_VALUE) {
                     holder.imageView.setImageResource(rowItem.getImageId());
@@ -693,10 +693,12 @@ public class FileDialog {
                 if (rowItem.getTitle().equals(selectedFileName)) {
                     rlDirItem.setBackgroundColor(context.getResources().getColor(R.color.file_dialog_color));
                     holder.txtTitle.setTextColor(Color.WHITE);
+                    holder.txtData.setTextColor(Color.WHITE);
                 }
                 else {
                     rlDirItem.setBackgroundColor(context.getResources().getColor(android.R.color.background_light));
                     holder.txtTitle.setTextColor(context.getResources().getColor(R.color.secondary_text));
+                    holder.txtData.setTextColor(context.getResources().getColor(R.color.secondary_text));
                 }
 
                 return convertView;
