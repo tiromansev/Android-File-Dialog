@@ -56,17 +56,16 @@ public class FileUtils {
 
         DecimalFormat dec = new DecimalFormat("0.00");
 
+        if (k<= 0) {
+            hrSize = String.valueOf(size).concat(" ");
+        }
         if (k > 0) {
-
             hrSize = dec.format(k).concat(" k ");
-
         }
         if (m > 0) {
-
             hrSize = dec.format(m).concat(" M ");
         }
         if (g > 0) {
-
             hrSize = dec.format(g).concat(" G ");
         }
 
