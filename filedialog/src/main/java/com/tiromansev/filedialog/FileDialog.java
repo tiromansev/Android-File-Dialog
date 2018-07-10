@@ -742,6 +742,16 @@ public class FileDialog {
             return this;
         }
 
+        public Builder setDirectoryComparator(Comparator<RowItem> directoryComparator) {
+            FileDialog.this.setDirectoryComparator(directoryComparator);
+            return this;
+        }
+
+        public Builder setFileComparator(Comparator<RowItem> fileComparator) {
+            FileDialog.this.setFileComparator(fileComparator);
+            return this;
+        }
+
         public FileDialog build() {
             return FileDialog.this;
         }
