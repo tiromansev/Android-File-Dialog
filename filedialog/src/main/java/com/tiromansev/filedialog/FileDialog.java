@@ -119,11 +119,13 @@ public class FileDialog {
         private final int imageId;
         private final String title;
         private final String data;
+        private final long lastModified;
 
-        public RowItem(int imageId, String title, String data) {
+        public RowItem(int imageId, String title, String data, long lastModified) {
             this.imageId = imageId;
             this.title = title;
             this.data = data;
+            this.lastModified = lastModified;
         }
 
         public int getImageId() {
@@ -136,6 +138,10 @@ public class FileDialog {
 
         public String getData() {
             return data;
+        }
+
+        public long getLastModified() {
+            return lastModified;
         }
 
         @Override
@@ -257,7 +263,7 @@ public class FileDialog {
         }
         subDirectories.clear();
         for (String rootDir: rootDirList) {
-            subDirectories.add(new RowItem(sdStorageImageId, new File(rootDir).getAbsolutePath(), null));
+            subDirectories.add(new RowItem(sdStorageImageId, new File(rootDir).getAbsolutePath(), null, 0L));
         }
     }
 
@@ -446,7 +452,7 @@ public class FileDialog {
 			for (File file : dirFile.listFiles()) {
 				if (file.isDirectory() && canExplore) {
                     RowItem item = new RowItem(file.canWrite() ? browserDirectoryImageId :
-                            browserDirectoryLockImageId, file.getName(), null);
+                            browserDirectoryLockImageId, file.getName(), null, file.lastModified());
                     dirs.add(item);
 				} else if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
                     boolean exclude = false;
@@ -473,14 +479,14 @@ public class FileDialog {
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry: fileIcons.entrySet()) {
                             if (file.getName().endsWith(entry.getKey())) {
-                                item = new RowItem(entry.getValue(), file.getName(), data);
+                                item = new RowItem(entry.getValue(), file.getName(), data, file.lastModified());
                                 files.add(item);
                                 break;
                             }
                         }
                     }
                     if (item == null) {
-                        item = new RowItem(fileImageId, file.getName(), data);
+                        item = new RowItem(fileImageId, file.getName(), data, file.lastModified());
                         files.add(item);
                     }
 				}
@@ -496,7 +502,7 @@ public class FileDialog {
 
         result = new ArrayList<>();
         if (dirFile.getParentFile() != null && canExplore) {
-            result.add(new RowItem(browserDirectoryUpImageId, "..", null));
+            result.add(new RowItem(browserDirectoryUpImageId, "..", null, 0L));
         }
         result.addAll(dirs);
         result.addAll(files);
