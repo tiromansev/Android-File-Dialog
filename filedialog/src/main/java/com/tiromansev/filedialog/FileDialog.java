@@ -62,6 +62,7 @@ public class FileDialog {
     private int browserDirectoryUpImageId = R.mipmap.ic_browser_folder_up;
     private int fileImageId = R.mipmap.ic_file;
     private int sdStorageImageId = R.mipmap.ic_sd_storage;
+    private boolean showAddFolder = true;
 
     public void setAddDirectoryImageId(int addDirectoryImageId) {
         this.addDirectoryImageId = addDirectoryImageId;
@@ -97,6 +98,10 @@ public class FileDialog {
 
     public void setUseOldFileDialog(boolean useOldFileDialog) {
         this.useOldFileDialog = useOldFileDialog;
+    }
+
+    public void setShowAddFolder(boolean showAddFolder) {
+        this.showAddFolder = showAddFolder;
     }
 
     public interface FileDialogListener {
@@ -581,7 +586,7 @@ public class FileDialog {
                         });
             }
         });
-        addFolder.setVisibility((selectType == FOLDER_CHOOSE || selectType == FILE_SAVE) ? View.VISIBLE : View.GONE);
+        addFolder.setVisibility((selectType == FOLDER_CHOOSE || selectType == FILE_SAVE) && showAddFolder ? View.VISIBLE : View.GONE);
         String selectFileCaption = context.getResources().getString(R.string.title_select_file);
         String folderSelectCaption = context.getResources().getString(R.string.caption_folder_select);
 
