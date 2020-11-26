@@ -25,6 +25,7 @@ public class BreadCrumbs {
     private Toolbar toolbar = null;
     private HorizontalScrollView parent = null;
     private Context context;
+    private final int breadCrumbsColor = ColorUtils.getAttrColor(R.attr.bread_crumbs_color, this.context);
     private SelectItemListener itemClickListener;
     private LinearLayout.LayoutParams layoutParams;
     private static final String ITEMS = "ITEMS";
@@ -70,7 +71,7 @@ public class BreadCrumbs {
     public void attachTo(HorizontalScrollView parent) {
         this.parent = parent;
         removeViews();
-        this.parent.setBackgroundColor(context.getResources().getColor(R.color.bread_crumbs_color));
+        this.parent.setBackgroundColor(breadCrumbsColor);
         this.parent.addView(toolbar);
     }
 
@@ -91,7 +92,7 @@ public class BreadCrumbs {
         button.setTag(itemTag);
         button.setLayoutParams(layoutParams);
         button.setImageResource(R.mipmap.ic_home);
-        button.setBackgroundColor(context.getResources().getColor(R.color.bread_crumbs_color));
+        button.setBackgroundColor(breadCrumbsColor);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +108,7 @@ public class BreadCrumbs {
         ImageButton button = new ImageButton(context);
         button.setLayoutParams(layoutParams);
         button.setImageResource(R.mipmap.ic_delimiter);
-        button.setBackgroundColor(context.getResources().getColor(R.color.bread_crumbs_color));
+        button.setBackgroundColor(breadCrumbsColor);
         toolbar.addView(button);
         items.put(button, items.size() + 1);
     }
@@ -201,7 +202,7 @@ public class BreadCrumbs {
         button.setTag(itemTag);
         button.setText(itemName);
         button.setLayoutParams(layoutParams);
-        button.setBackgroundColor(context.getResources().getColor(R.color.bread_crumbs_color));
+        button.setBackgroundColor(breadCrumbsColor);
         button.setTextColor(context.getResources().getColor(R.color.color_white));
         button.setAllCaps(false);
         button.setGravity(Gravity.CENTER);

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/dialog_margin"
-    android:background="@color/file_dialog_color">
+    android:background="?attr/file_dialog_color">
 
     <TextView
         android:text="TextView"
@@ -14,14 +14,14 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:textColor="@color/color_white" />
+        android:textColor="?android:textColorPrimary" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@mipmap/ic_add_folder"
         android:id="@+id/btnAddFolder"
-        android:background="@color/file_dialog_color"
+        android:background="?attr/file_dialog_color"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true" />
 
