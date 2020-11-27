@@ -3,8 +3,8 @@
     package="com.tiromansev.filedialog">
 
     <application android:allowBackup="true"
-        android:supportsRtl="true">
-
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
     </application>
 
 </manifest>
