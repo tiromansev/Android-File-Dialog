@@ -42,7 +42,7 @@ public class BreadCrumbs {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, (int) context.getResources().getDimension(R.dimen.breadcrumb_toolbar_height));
         layoutParams.gravity = Gravity.LEFT;
-        breadCrumbsColor = ColorUtils.getAttrColor(R.attr.bread_crumbs_color, this.context);
+        breadCrumbsColor = ColorUtils.getAttrColor(R.attr.colorPrimaryDark, this.context);
         this.toolbar.setLayoutParams(layoutParams);
         this.toolbar.setPopupTheme(R.style.AppTheme_PopupMenu);
         this.toolbar.setTitleTextAppearance(context, R.style.ToolbarTitle);
