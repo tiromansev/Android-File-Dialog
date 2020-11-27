@@ -25,7 +25,7 @@ public class BreadCrumbs {
     private Toolbar toolbar = null;
     private HorizontalScrollView parent = null;
     private Context context;
-    private final int breadCrumbsColor = ColorUtils.getAttrColor(R.attr.bread_crumbs_color, this.context);
+    private int breadCrumbsColor;
     private SelectItemListener itemClickListener;
     private LinearLayout.LayoutParams layoutParams;
     private static final String ITEMS = "ITEMS";
@@ -42,6 +42,7 @@ public class BreadCrumbs {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, (int) context.getResources().getDimension(R.dimen.breadcrumb_toolbar_height));
         layoutParams.gravity = Gravity.LEFT;
+        breadCrumbsColor = ColorUtils.getAttrColor(R.attr.bread_crumbs_color, this.context);
         this.toolbar.setLayoutParams(layoutParams);
         this.toolbar.setPopupTheme(R.style.AppTheme_PopupMenu);
         this.toolbar.setTitleTextAppearance(context, R.style.ToolbarTitle);
