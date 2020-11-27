@@ -9,6 +9,6 @@ public class ColorUtils {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(colorId, typedValue, true);
 
-        return context.getResources().getColor(typedValue.resourceId);
+        return context.getTheme().getResources().getColor(typedValue.resourceId);
     }
 }
