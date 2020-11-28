@@ -7,8 +7,9 @@ public class ColorUtils {
 
     public static int getAttrColor(int colorId, Context context) {
         TypedValue typedValue = new TypedValue();
+        context.getTheme().applyStyle(R.style.Theme_AppCompat, true);
         context.getTheme().resolveAttribute(colorId, typedValue, true);
 
-        return context.getTheme().getResources().getColor(typedValue.resourceId);
+        return context.getResources().getColor(typedValue.resourceId);
     }
 }
