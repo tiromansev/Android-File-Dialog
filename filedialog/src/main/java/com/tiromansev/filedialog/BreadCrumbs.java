@@ -25,7 +25,6 @@ public class BreadCrumbs {
     private Toolbar toolbar = null;
     private HorizontalScrollView parent = null;
     private Context context;
-    private int breadCrumbsColor;
     private SelectItemListener itemClickListener;
     private LinearLayout.LayoutParams layoutParams;
     private static final String ITEMS = "ITEMS";
@@ -42,7 +41,6 @@ public class BreadCrumbs {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, (int) context.getResources().getDimension(R.dimen.breadcrumb_toolbar_height));
         layoutParams.gravity = Gravity.LEFT;
-        breadCrumbsColor = ColorUtils.getAttrColor(R.attr.colorPrimaryDark, this.context);
         this.toolbar.setLayoutParams(layoutParams);
         this.toolbar.setPopupTheme(R.style.AppTheme_PopupMenu);
         this.toolbar.setTitleTextAppearance(context, R.style.ToolbarTitle);
@@ -72,7 +70,7 @@ public class BreadCrumbs {
     public void attachTo(HorizontalScrollView parent) {
         this.parent = parent;
         removeViews();
-        this.parent.setBackgroundColor(breadCrumbsColor);
+        this.parent.setBackgroundResource(R.drawable.breadcrumb_button);
         this.parent.addView(toolbar);
     }
 
@@ -93,7 +91,7 @@ public class BreadCrumbs {
         button.setTag(itemTag);
         button.setLayoutParams(layoutParams);
         button.setImageResource(R.mipmap.ic_home);
-        button.setBackgroundColor(breadCrumbsColor);
+        button.setBackgroundResource(R.drawable.breadcrumb_button);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +107,7 @@ public class BreadCrumbs {
         ImageButton button = new ImageButton(context);
         button.setLayoutParams(layoutParams);
         button.setImageResource(R.mipmap.ic_delimiter);
-        button.setBackgroundColor(breadCrumbsColor);
+        button.setBackgroundResource(R.drawable.breadcrumb_button);
         toolbar.addView(button);
         items.put(button, items.size() + 1);
     }
@@ -203,12 +201,11 @@ public class BreadCrumbs {
         button.setTag(itemTag);
         button.setText(itemName);
         button.setLayoutParams(layoutParams);
-        button.setBackgroundColor(breadCrumbsColor);
+        button.setBackgroundResource(R.drawable.breadcrumb_button);
         button.setTextColor(context.getResources().getColor(R.color.color_white));
         button.setAllCaps(false);
         button.setGravity(Gravity.CENTER);
         button.setIncludeFontPadding(false);
-        button.setBackgroundResource(R.drawable.breadcrumb_button);
         int buttonPadding = (int) context.getResources().getDimension(R.dimen.breadcrumb_button_padding);
         button.setPadding(buttonPadding, 0, 0, 0);
         button.setTypeface(null, Typeface.BOLD);
