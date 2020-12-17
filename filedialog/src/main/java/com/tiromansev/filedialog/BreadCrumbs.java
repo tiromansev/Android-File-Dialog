@@ -202,7 +202,7 @@ public class BreadCrumbs {
         button.setText(itemName);
         button.setLayoutParams(layoutParams);
         button.setBackgroundResource(R.drawable.breadcrumb_button);
-        button.setTextColor(context.getResources().getColor(R.color.color_white));
+        button.setTextColor(ColorUtils.getAttrColor(R.attr.bread_crumbs_text_color, context));
         button.setAllCaps(false);
         button.setGravity(Gravity.CENTER);
         button.setIncludeFontPadding(false);
