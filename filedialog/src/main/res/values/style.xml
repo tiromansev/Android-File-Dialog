@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="BreadCrumbsTheme">
-        <item name="file_dialog_color">@color/file_dialog_color</item>
-        <item name="bread_crumbs_text_color">@color/file_dialog_color</item>
-        <item name="bread_crumbs_background_color">@color/file_dialog_color</item>
-    </style>
-
     <style name="AppTheme.PopupMenu" parent="ThemeOverlay.AppCompat.Dark">
         <!-- popup menu background - NEVER "android:background" !!! in themes -->
         <item name="android:colorBackground">@color/color_white</item>
