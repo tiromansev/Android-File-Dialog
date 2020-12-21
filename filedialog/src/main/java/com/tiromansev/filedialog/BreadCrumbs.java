@@ -30,6 +30,7 @@ public class BreadCrumbs {
     private static final String ITEMS = "ITEMS";
     public static final int UNDEFINED_VALUE = -1;
 
+    //context - only activity, not applicationContext!!!
     public BreadCrumbs(Context context) {
         this.context = context;
         layoutParams = new LinearLayout.LayoutParams(
