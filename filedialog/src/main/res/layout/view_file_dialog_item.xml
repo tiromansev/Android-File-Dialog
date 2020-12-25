@@ -5,7 +5,7 @@
     android:gravity="center_vertical"
     android:paddingLeft="@dimen/dialog_margin"
     android:paddingRight="@dimen/dialog_margin"
-    android:background="?android:background"
+    android:background="?attr/file_dialog_background"
     android:id="@+id/rlDirItem">
 
     <ImageView
