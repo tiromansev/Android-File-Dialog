@@ -532,7 +532,7 @@ public class FileDialog {
         titleLayout.addView(createTitleLayout());
         getBreadCrumb();
         titleLayout.addView(scrollView);
-        titleLayout.setBackgroundColor(context.getResources().getColor(R.color.file_dialog_color));
+        titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, context));
 
 		// ////////////////////////////////////////
 		// Set Views and Finish Dialog builder //
@@ -702,14 +702,14 @@ public class FileDialog {
                     holder.imageView.setImageBitmap(null);
                 }
                 if (rowItem.getTitle().equals(selectedFileName)) {
-                    rlDirItem.setBackgroundColor(context.getResources().getColor(R.color.file_dialog_color));
-                    holder.txtTitle.setTextColor(Color.WHITE);
-                    holder.txtData.setTextColor(Color.WHITE);
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, context));
+                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, context));
+                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, context));
                 }
                 else {
-                    rlDirItem.setBackgroundColor(context.getResources().getColor(android.R.color.background_light));
-                    holder.txtTitle.setTextColor(context.getResources().getColor(R.color.secondary_text));
-                    holder.txtData.setTextColor(context.getResources().getColor(R.color.secondary_text));
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_background, context));
+                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, context));
+                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, context));
                 }
 
                 return convertView;

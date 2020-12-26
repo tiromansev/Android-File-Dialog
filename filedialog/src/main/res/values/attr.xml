@@ -4,4 +4,7 @@
     <attr name="bread_crumbs_text_color" format="color"/>
     <attr name="file_dialog_color" format="color"/>
     <attr name="file_dialog_background" format="color"/>
+    <attr name="file_dialog_title_background" format="color"/>
+    <attr name="file_dialog_dir_item_color" format="color"/>
+    <attr name="file_dialog_selected_dir_item_color" format="color"/>
 </resources>
