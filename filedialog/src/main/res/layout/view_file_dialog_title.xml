@@ -14,7 +14,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:textColor="?android:textColorPrimary" />
+        android:textColor="?attr/bread_crumbs_text_color" />
 
     <ImageButton
         android:layout_width="wrap_content"
