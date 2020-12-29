@@ -260,6 +260,10 @@ public class BreadCrumbs {
     }
 
     public void setItems(HashMap<String, Integer> restoreItems) {
+        setItems(restoreItems, true);
+    }
+
+    public void setItems(HashMap<String, Integer> restoreItems, boolean useAttrs) {
         if (!restoreItems.isEmpty()) {
             Map<String, Integer> sortedItems = new TreeMap<>(restoreItems);
             Set<Map.Entry<String, Integer>> set = sortedItems.entrySet();
@@ -267,7 +271,7 @@ public class BreadCrumbs {
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
             while (iterator.hasNext()) {
                 Map.Entry<String, Integer> entry = iterator.next();
-                addItem(entry.getKey(), String.valueOf(entry.getValue()));
+                addItem(entry.getKey(), String.valueOf(entry.getValue()), useAttrs);
             }
         }
     }
