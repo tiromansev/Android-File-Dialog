@@ -198,12 +198,18 @@ public class BreadCrumbs {
     }
 
     public void addItem(String itemName, String itemTag) {
+        addItem(itemName, itemTag, true);
+    }
+
+    public void addItem(String itemName, String itemTag, boolean useAttrs) {
         TextView button = new TextView(context);
         button.setTag(itemTag);
         button.setText(itemName);
         button.setLayoutParams(layoutParams);
         button.setBackgroundResource(R.drawable.breadcrumb_button);
-        button.setTextColor(ColorUtils.getAttrColor(R.attr.bread_crumbs_text_color, context));
+        if (useAttrs) {
+            button.setTextColor(ColorUtils.getAttrColor(R.attr.bread_crumbs_text_color, context));
+        }
         button.setAllCaps(false);
         button.setGravity(Gravity.CENTER);
         button.setIncludeFontPadding(false);
