@@ -47,6 +47,10 @@ public class BreadCrumbs {
         this.toolbar.setTitleTextAppearance(context, R.style.ToolbarTitle);
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     public Toolbar getToolbar() {
         return toolbar;
     }
