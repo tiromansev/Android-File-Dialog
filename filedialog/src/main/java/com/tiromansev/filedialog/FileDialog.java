@@ -100,6 +100,10 @@ public class FileDialog {
         this.useOldFileDialog = useOldFileDialog;
     }
 
+    public Activity getContext() {
+        return context;
+    }
+
     protected int getSelectType() {
         return selectType;
     }
