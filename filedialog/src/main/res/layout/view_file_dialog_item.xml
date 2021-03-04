@@ -14,7 +14,8 @@
         android:layout_alignParentLeft="true"
         android:id="@+id/ivFileImage"
         android:scaleType="centerInside"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
 
     <LinearLayout
         android:id="@+id/lItem"
@@ -23,7 +24,9 @@
         android:layout_alignParentRight="true"
         android:layout_marginLeft="@dimen/text_margin"
         android:layout_toEndOf="@+id/ivFileImage"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/text_margin">
 
         <TextView
             android:id="@+id/tvFileItem"

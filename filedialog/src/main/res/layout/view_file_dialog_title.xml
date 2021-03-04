@@ -14,7 +14,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:textColor="?attr/bread_crumbs_text_color" />
+        android:textColor="?attr/bread_crumbs_text_color"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -23,6 +24,7 @@
         android:id="@+id/btnAddFolder"
         android:background="?attr/file_dialog_title_background"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
