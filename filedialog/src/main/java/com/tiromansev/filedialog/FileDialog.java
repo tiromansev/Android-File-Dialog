@@ -31,13 +31,9 @@ import java.util.Map;
 
 import static com.tiromansev.filedialog.BreadCrumbs.UNDEFINED_VALUE;
 
-public class FileDialog {
+public class FileDialog implements IFileDialog {
 
     private BreadCrumbs breadCrumbs;
-
-    public static final int FILE_OPEN = 0;
-    public static final int FILE_SAVE = 1;
-    public static final int FOLDER_CHOOSE = 2;
     private int selectType = FILE_OPEN;
 
     private String[] filterFileExt;
@@ -63,6 +59,11 @@ public class FileDialog {
     private int fileImageId = R.mipmap.ic_file;
     private int sdStorageImageId = R.mipmap.ic_sd_storage;
     private boolean showAddFolder = true;
+
+    @Override
+    public void setAddModifiedDate(boolean add) {
+        addModifiedDate = add;
+    }
 
     public void setAddDirectoryImageId(int addDirectoryImageId) {
         this.addDirectoryImageId = addDirectoryImageId;
@@ -132,10 +133,6 @@ public class FileDialog {
         this.showAddFolder = showAddFolder;
     }
 
-    public interface FileDialogListener {
-        void onChosenDir(String chosenDir);
-    }
-
     public String[] getFilterFileExt() {
         return filterFileExt;
     }
@@ -144,6 +141,7 @@ public class FileDialog {
         this.fileIcons = fileIcons;
     }
 
+    @Override
     public void setFilterFileExt(String[] filterFileExt) {
         this.filterFileExt = filterFileExt;
     }
@@ -241,6 +239,7 @@ public class FileDialog {
         initRootDirList();
     }
 
+    @Override
     public void setSelectType(int selectType) {
         this.selectType = selectType;
     }
@@ -249,6 +248,7 @@ public class FileDialog {
         this.canExplore = canExplore;
     }
 
+    @Override
     public void setFileDialogListener(FileDialogListener fileDialogListener) {
         this.fileDialogListener = fileDialogListener;
     }
@@ -402,7 +402,7 @@ public class FileDialog {
                         // Call registered listener supplied with the chosen
                         // directory
                         if (fileDialogListener != null) {
-                            if (selectType == FILE_OPEN || selectType == FILE_SAVE) {
+                            if (selectType == FILE_OPEN) {
                                 if (selectedFileName.length() > 0) {
                                     fileDialogListener.onChosenDir(currentDir + "/" + selectedFileName);
                                 } else {
@@ -432,13 +432,9 @@ public class FileDialog {
                     public void onClick(View view) {
                         if (fileDialogListener != null) {
                             File parentDir = new File(currentDir);
-                            if (selectType == FILE_OPEN || selectType == FILE_SAVE) {
+                            if (selectType == FILE_OPEN) {
                                 if (selectedFileName.length() == 0) {
                                     GuiUtils.showMessage(context, R.string.message_file_must_be_selected);
-                                    return;
-                                }
-                                if (selectType == FILE_SAVE && !parentDir.canWrite()) {
-                                    GuiUtils.showMessage(context, R.string.message_write_permission_denied);
                                     return;
                                 }
                                 fileDialogListener.onChosenDir(currentDir + "/" + selectedFileName);
@@ -480,7 +476,7 @@ public class FileDialog {
                     RowItem item = new RowItem(file.canWrite() ? browserDirectoryImageId :
                             browserDirectoryLockImageId, file.getName(), null, file.lastModified());
                     dirs.add(item);
-                } else if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
+                } else if (selectType == FILE_OPEN) {
                     boolean exclude = false;
                     if (filterFileExt != null && filterFileExt.length > 0) {
                         exclude = true;
@@ -561,8 +557,6 @@ public class FileDialog {
         dialogBuilder.setCustomTitle(titleLayout);
         if (selectType == FILE_OPEN)
             dialogBuilder.setTitle(R.string.title_select_file);
-        if (selectType == FILE_SAVE)
-            dialogBuilder.setTitle(R.string.caption_save_as);
         if (selectType == FOLDER_CHOOSE)
             dialogBuilder.setTitle(R.string.caption_folder_select);
         listAdapter = createListAdapter(listItems);
@@ -607,12 +601,11 @@ public class FileDialog {
                         });
             }
         });
-        addFolder.setVisibility((selectType == FOLDER_CHOOSE || selectType == FILE_SAVE) && showAddFolder ? View.VISIBLE : View.GONE);
+        addFolder.setVisibility((selectType == FOLDER_CHOOSE) && showAddFolder ? View.VISIBLE : View.GONE);
         String selectFileCaption = context.getResources().getString(R.string.title_select_file);
         String folderSelectCaption = context.getResources().getString(R.string.caption_folder_select);
 
         switch (selectType) {
-            case FILE_SAVE:
             case FOLDER_CHOOSE:
                 tvTitle.setText(folderSelectCaption);
                 break;
@@ -664,7 +657,7 @@ public class FileDialog {
         }
         String fileName = "";
         // #scorch
-        if (selectType == FILE_SAVE || selectType == FILE_OPEN) {
+        if (selectType == FILE_OPEN) {
             fileName = selectedFileName;
         }
         File file = new File(currentDir + "/" + fileName);
@@ -741,7 +734,7 @@ public class FileDialog {
         }
 
         public Builder setSelectType(int selectType) {
-            FileDialog.this.selectType = selectType;
+            FileDialog.this.setSelectType(selectType);
             return this;
         }
 
@@ -751,17 +744,17 @@ public class FileDialog {
         }
 
         public Builder setAddModifiedDate(boolean add) {
-            FileDialog.this.addModifiedDate = add;
+            FileDialog.this.setAddModifiedDate(add);
             return this;
         }
 
         public Builder setFileDialogListener(FileDialogListener listener) {
-            FileDialog.this.fileDialogListener = listener;
+            FileDialog.this.setFileDialogListener(listener);
             return this;
         }
 
         public Builder setFilterFileExt(String[] filterFileExt) {
-            FileDialog.this.filterFileExt = filterFileExt;
+            FileDialog.this.setFilterFileExt(filterFileExt);
             return this;
         }
 

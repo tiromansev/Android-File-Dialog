@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.tiromansev.filedialog.FileDialog;
+import com.tiromansev.filedialog.FileDialogListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
                         .setCanExplore(true)
                         .setSelectType(FileDialog.FILE_OPEN)
                         .setAddModifiedDate(true)
-                        .setFileDialogListener(new FileDialog.FileDialogListener() {
+                        .setFileDialogListener(new FileDialogListener() {
                             @Override
                             public void onChosenDir(String chosenDir) {
                                 Toast.makeText(MainActivity.this, chosenDir, Toast.LENGTH_LONG).show();
