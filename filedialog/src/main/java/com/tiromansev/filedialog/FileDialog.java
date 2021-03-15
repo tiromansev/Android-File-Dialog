@@ -33,6 +33,8 @@ import static com.tiromansev.filedialog.BreadCrumbs.UNDEFINED_VALUE;
 
 public class FileDialog implements IFileDialog {
 
+    public static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 9999;
+
     private BreadCrumbs breadCrumbs;
     private int selectType = FILE_OPEN;
 
@@ -279,12 +281,29 @@ public class FileDialog implements IFileDialog {
     }
 
     public void show(String dir) {
+        if (!PermissionUtils.hasManageStoragePermission(getContext())) {
+            AppPrefs.initialPath().setValue(dir);
+            getContext().startActivityForResult(PermissionUtils.getManageStoragePermissionIntent(), REQUEST_MANAGE_EXTERNAL_STORAGE);
+            return;
+        }
+
         // Initial directory is sdcard directory
         File initDir = new File(dir);
         if ((dir.equals("")) || (!initDir.exists()))
             choose("");
         else {
             choose(dir);
+        }
+    }
+
+    public void handleRequestManageStorageAccess(int requestCode) {
+        if (!CommonUtils.isRVersion()) {
+            return;
+        }
+        if (requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
+            if (PermissionUtils.hasManageStoragePermission(getContext())) {
+                show(AppPrefs.initialPath().getValue());
+            }
         }
     }
 

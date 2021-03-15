@@ -26,7 +26,8 @@
         android:layout_toEndOf="@+id/ivFileImage"
         android:orientation="vertical"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="@dimen/text_margin">
+        android:layout_marginStart="@dimen/text_margin"
+        android:layout_toRightOf="@+id/ivFileImage">
 
         <TextView
             android:id="@+id/tvFileItem"

@@ -26,6 +26,7 @@ dependencies {
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation 'com.github.tiromansev:Android-Prefs-Wrapper:0.3.3'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     testImplementation 'junit:junit:4.13.1'
     implementation files('src/main/extra/system.jar')

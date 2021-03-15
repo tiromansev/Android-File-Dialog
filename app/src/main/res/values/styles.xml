@@ -6,6 +6,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="bread_crumbs_text_color">@color/color_white</item>
+        <item name="file_dialog_title_background">@color/colorPrimary</item>
+        <item name="file_dialog_background">@color/color_white</item>
+        <item name="file_dialog_dir_item_color">@color/colorPrimary</item>
+        <item name="file_dialog_selected_dir_item_color">@color/color_white</item>
     </style>
 
 </resources>
