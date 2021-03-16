@@ -2,6 +2,7 @@ package com.tiromansev.filedialog;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import java.io.File;
@@ -281,11 +283,12 @@ public class FileDialog implements IFileDialog {
     }
 
     public void show(String dir) {
-        if (!PermissionUtils.hasManageStoragePermission(getContext())) {
-            AppPrefs.initialPath().setValue(dir);
-            getContext().startActivityForResult(PermissionUtils.getManageStoragePermissionIntent(), REQUEST_MANAGE_EXTERNAL_STORAGE);
-            return;
-        }
+        //используем SAF
+//        if (CommonUtils.isRVersion()) {
+//            AppPrefs.initialPath().setValue(dir);
+//
+//            return;
+//        }
 
         // Initial directory is sdcard directory
         File initDir = new File(dir);
@@ -296,15 +299,8 @@ public class FileDialog implements IFileDialog {
         }
     }
 
-    public void handleRequestManageStorageAccess(int requestCode) {
-        if (!CommonUtils.isRVersion()) {
-            return;
-        }
-        if (requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
-            if (PermissionUtils.hasManageStoragePermission(getContext())) {
-                show(AppPrefs.initialPath().getValue());
-            }
-        }
+    public void handleRequestResult(int requestCode, int resultCode, @Nullable Intent data) {
+
     }
 
     private void showRootDir() {
