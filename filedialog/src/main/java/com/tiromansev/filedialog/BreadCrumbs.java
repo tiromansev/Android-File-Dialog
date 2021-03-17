@@ -13,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tiromansev.filedialog.utils.ColorUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

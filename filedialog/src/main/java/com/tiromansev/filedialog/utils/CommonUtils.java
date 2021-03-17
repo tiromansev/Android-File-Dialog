@@ -1,4 +1,4 @@
-package com.tiromansev.filedialog;
+package com.tiromansev.filedialog.utils;
 
 import android.os.Build;
 

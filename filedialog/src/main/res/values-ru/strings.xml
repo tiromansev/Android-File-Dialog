@@ -25,4 +25,7 @@
     <string name="dir_empty">%s (empty)</string>
     <string name="dir_name_size">%1$s (%2$s)</string>
     <string name="storage_card">Storage card</string>
+    <string name="caption_use_dir">Использовать</string>
+    <string name="caption_select_other">Выбрать другую</string>
+    <string name="message_selected_file_dialog_base_dir">Использовать выбранную папку %1$s или выбрать другую?</string>
 </resources>
