@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/dialog_margin"
@@ -11,7 +12,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/btnChangeFolder"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="?attr/bread_crumbs_text_color" />
+
+    <ImageButton
+        android:id="@+id/btnChangeFolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="?attr/file_dialog_title_background"
+        app:srcCompat="@drawable/ic_change_folder" />
 
 </RelativeLayout>

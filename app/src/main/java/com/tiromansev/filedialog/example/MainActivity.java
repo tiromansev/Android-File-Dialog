@@ -22,10 +22,11 @@ public class MainActivity extends AppCompatActivity {
         Button btnOpenDialog = findViewById(R.id.btnOpenDialog);
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = FileDialog.create(MainActivity.this)
-                    .setSelectType(FileDialog.FILE_OPEN)
+                    .setSelectType(FileDialog.FOLDER_CHOOSE)
+                    .setFileName("new_file_name.txt")
                     .setAddModifiedDate(true)
                     .setFileDialogListener(file ->
-                            GuiUtils.showMessage(MainActivity.this, file.getFilePath()))
+                            GuiUtils.showMessage(MainActivity.this, file.toString()))
                     .build();
             fileDialog.show();
         });

@@ -1,7 +1,9 @@
 package com.tiromansev.filedialog;
 
+import android.net.Uri;
+
 public interface FileDialogListener {
 
-    void onChosenDir(SafFile file);
+    void onFileResult(Uri uri);
 
 }

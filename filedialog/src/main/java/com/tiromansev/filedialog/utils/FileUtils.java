@@ -47,7 +47,7 @@ public class FileUtils {
         try {
             if (uri != null) {
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = context.getContentResolver().query(uri, filePathColumn, null, null, null);
+                Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
                 String filePath = "";
                 if (cursor != null) {
                     if (cursor.moveToFirst()) {

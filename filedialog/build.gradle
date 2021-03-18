@@ -33,5 +33,6 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.github.tiromansev:Android-Prefs-Wrapper:0.3.3'
+    implementation 'com.google.android.material:material:1.2.1'//после обновления проверять работу приложения, могут быть сбои!!
     testImplementation 'junit:junit:4.13.1'
 }

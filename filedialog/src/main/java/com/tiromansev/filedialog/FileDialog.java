@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -52,45 +54,26 @@ public class FileDialog implements IFileDialog {
     private Comparator<RowItem> fileComparator;
     private HashMap<String, Integer> fileIcons = new HashMap<>();
     private boolean addModifiedDate = false;
-
-    private int addDirectoryImageId = R.mipmap.ic_add_folder;
-    private int browserDirectoryImageId = R.mipmap.ic_browser_folder;
-    private int browserDirectoryLockImageId = R.mipmap.ic_browser_folder_lock;
-    private int browserDirectoryUpImageId = R.mipmap.ic_browser_folder_up;
+    private AlertDialog openFileDialog;
+    private AlertDialog saveFileDialog;
     private int fileImageId = R.mipmap.ic_file;
-    private int sdStorageImageId = R.mipmap.ic_sd_storage;
+    private String fileName;
 
     @Override
     public void setAddModifiedDate(boolean add) {
         addModifiedDate = add;
     }
 
-    public void setAddDirectoryImageId(int addDirectoryImageId) {
-        this.addDirectoryImageId = addDirectoryImageId;
-    }
-
-    public void setBrowserDirectoryImageId(int browserDirectoryImageId) {
-        this.browserDirectoryImageId = browserDirectoryImageId;
-    }
-
-    public void setBrowserDirectoryLockImageId(int browserDirectoryLockImageId) {
-        this.browserDirectoryLockImageId = browserDirectoryLockImageId;
-    }
-
-    public void setBrowserDirectoryUpImageId(int browserDirectoryUpImageId) {
-        this.browserDirectoryUpImageId = browserDirectoryUpImageId;
-    }
-
     public void setFileImageId(int fileImageId) {
         this.fileImageId = fileImageId;
     }
 
-    public void setSdStorageImageId(int sdStorageImageId) {
-        this.sdStorageImageId = sdStorageImageId;
-    }
-
     public void setFileComparator(Comparator<RowItem> fileComparator) {
         this.fileComparator = fileComparator;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public Activity getContext() {
@@ -127,15 +110,15 @@ public class FileDialog implements IFileDialog {
     }
 
     private Uri getBaseUri() {
-        if (!TextUtils.isEmpty(AppPrefs.initialPath().getValue())) {
-            return Uri.parse(AppPrefs.initialPath().getValue());
+        if (!TextUtils.isEmpty(AppPrefs.basePath().getValue())) {
+            return Uri.parse(AppPrefs.basePath().getValue());
         }
 
         return null;
     }
 
     private void setBaseUri(Uri uri) {
-        AppPrefs.initialPath().setValue(uri.toString());
+        AppPrefs.basePath().setValue(uri.toString());
     }
 
     public FileDialog(Activity context) {
@@ -171,12 +154,7 @@ public class FileDialog implements IFileDialog {
             return;
         }
 
-        String message = getContext().getString(R.string.message_selected_file_dialog_base_dir);
-        message = String.format(message, new SafFile(getContext(), getBaseUri()).getName());
-        DialogUtils.showQuestionDialog(getContext(),
-                message,
-                (dialog, which) -> handleSafAction(),
-                (dialog, which) -> openSaf());
+        handleSafAction();
     }
 
     private void openSaf() {
@@ -187,11 +165,10 @@ public class FileDialog implements IFileDialog {
     private void handleSafAction() {
         SafFile safFile = new SafFile(getContext(), getBaseUri());
 
-        if (selectType == FILE_OPEN) {
-            choose(safFile);
-        } else {
-            fileDialogListener.onChosenDir(safFile);
-        }
+        if (selectType == FILE_OPEN)
+            selectFile(safFile);
+        else
+            selectFolder(safFile);
     }
 
     public void handleRequestResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -201,18 +178,48 @@ public class FileDialog implements IFileDialog {
         if (resultCode == RESULT_OK && requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
             if (data != null) {
                 Uri uri = data.getData();
-                getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                getContext().getContentResolver().takePersistableUriPermission(uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 setBaseUri(uri);
                 handleSafAction();
             }
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // choose(String dir) - load directory chooser dialog for initial
-    // input 'dir' directory
-    // //////////////////////////////////////////////////////////////////////////////
-    private void choose(SafFile safFile) {
+    private void selectFolder(SafFile safFile) {
+        AlertDialog.Builder dialogBuilder = createFileSaveDialog();
+        LinearLayout dialogView =
+                (LinearLayout) getContext().getLayoutInflater().inflate(R.layout.view_save_file, null);
+        EditText edtFileName = dialogView.findViewById(R.id.edtFileName);
+        edtFileName.setText(fileName);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setPositiveButton(R.string.caption_ok, null);
+        edtFileName.requestFocus();
+
+        saveFileDialog = dialogBuilder.create();
+
+        saveFileDialog.show();
+        saveFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
+                view -> {
+                    if (fileDialogListener != null) {
+                        String fileName = edtFileName.getText().toString();
+                        if (TextUtils.isEmpty(fileName)) {
+                            GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
+                            return;
+                        }
+                        DocumentFile result = safFile.getFile().createFile("*/*", fileName);
+                        if (result == null) {
+                            GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
+                            return;
+                        }
+                        fileDialogListener.onFileResult(result.getUri());
+                        saveFileDialog.dismiss();
+                    }
+                }
+        );
+    }
+
+    private void selectFile(SafFile safFile) {
         List<RowItem> files = getFiles(safFile);
         if (files == null) {
             return;
@@ -221,35 +228,31 @@ public class FileDialog implements IFileDialog {
         class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener {
             public void onClick(DialogInterface dialog, int item) {
                 ArrayAdapter<RowItem> adapter = (ArrayAdapter<RowItem>) ((AlertDialog) dialog).getListView().getAdapter();
-                selectedFile = (RowItem) adapter.getItem(item);
+                selectedFile = adapter.getItem(item);
                 adapter.notifyDataSetChanged();
             }
         }
 
-        AlertDialog.Builder dialogBuilder = createDirectoryChooserDialog(
+        AlertDialog.Builder dialogBuilder = createFileOpenDialog(
                 files, new SimpleFileDialogOnClickListener());
-        String okCaption = getContext().getResources().getString(R.string.caption_ok);
+        dialogBuilder.setPositiveButton(R.string.caption_ok, null);
 
-        dialogBuilder.setPositiveButton(
-                okCaption,
-                null);
-
-        final AlertDialog dirsDialog = dialogBuilder.create();
-        ListView listView = dirsDialog.getListView();
+        openFileDialog = dialogBuilder.create();
+        ListView listView = openFileDialog.getListView();
         listView.setDivider(new ColorDrawable(getContext().getResources().getColor(R.color.button_focused_color_start))); // set color
         listView.setDividerHeight(1); // set height
 
         // Show directory chooser dialog
-        dirsDialog.show();
-        dirsDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
+        openFileDialog.show();
+        openFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
                     if (fileDialogListener != null) {
-                            if (selectedFile == null) {
-                                GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
-                                return;
-                            }
-                            fileDialogListener.onChosenDir(new SafFile(getContext(), selectedFile.getUri()));
-                            dirsDialog.dismiss();
+                        if (selectedFile == null) {
+                            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
+                            return;
+                        }
+                        fileDialogListener.onFileResult(selectedFile.getUri());
+                        openFileDialog.dismiss();
                     }
                 }
         );
@@ -265,7 +268,8 @@ public class FileDialog implements IFileDialog {
                     if (filterFileExt != null && filterFileExt.length > 0) {
                         exclude = true;
                         for (String filter : filterFileExt) {
-                            if (file.getName().endsWith(filter)) {
+                            String name = file.getName();
+                            if (name != null && name.endsWith(filter)) {
                                 exclude = false;
                                 break;
                             }
@@ -284,7 +288,8 @@ public class FileDialog implements IFileDialog {
                     }
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry : fileIcons.entrySet()) {
-                            if (file.getName().endsWith(entry.getKey())) {
+                            String name = file.getName();
+                            if (name != null && name.endsWith(entry.getKey())) {
                                 item = new RowItem(entry.getValue(), file.getName(), data, file.lastModified(), file.getUri());
                                 files.add(item);
                                 break;
@@ -307,17 +312,9 @@ public class FileDialog implements IFileDialog {
         return new ArrayList<>(files);
     }
 
-    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // //// START DIALOG DEFINITION //////
-    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private AlertDialog.Builder createDirectoryChooserDialog(
-            List<RowItem> listItems,
-            DialogInterface.OnClickListener onClickListener) {
+    private AlertDialog.Builder createFileSaveDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
 
-        // ///////////////////////////////////////////////////
-        // Create View with folder path and entry text box //
-        // ///////////////////////////////////////////////////
         LinearLayout titleLayout = new LinearLayout(getContext());
         titleLayout.setOrientation(LinearLayout.VERTICAL);
         titleLayout.setBackgroundResource(R.drawable.bottom_border);
@@ -325,11 +322,24 @@ public class FileDialog implements IFileDialog {
         titleLayout.addView(createTitleLayout());
         titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
 
-        // ////////////////////////////////////////
-        // Set Views and Finish Dialog builder //
-        // ////////////////////////////////////////
         dialogBuilder.setCustomTitle(titleLayout);
-        dialogBuilder.setTitle(R.string.title_select_file);
+        dialogBuilder.setCancelable(true);
+        dialogBuilder.setTitle(null);
+        return dialogBuilder;
+    }
+
+    private AlertDialog.Builder createFileOpenDialog(List<RowItem> listItems,
+                                                     DialogInterface.OnClickListener onClickListener) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
+
+        LinearLayout titleLayout = new LinearLayout(getContext());
+        titleLayout.setOrientation(LinearLayout.VERTICAL);
+        titleLayout.setBackgroundResource(R.drawable.bottom_border);
+
+        titleLayout.addView(createTitleLayout());
+        titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
+
+        dialogBuilder.setCustomTitle(titleLayout);
         dialogBuilder.setSingleChoiceItems(createListAdapter(listItems), -1, onClickListener);
         dialogBuilder.setCancelable(true);
         return dialogBuilder;
@@ -346,11 +356,24 @@ public class FileDialog implements IFileDialog {
         titleParams.setMargins(dialogMargin, dialogMargin, dialogMargin, dialogBottomMargin);
         titleView.setLayoutParams(titleParams);
 
+        ImageButton btnChangeFolder = titleView.findViewById(R.id.btnChangeFolder);
+        btnChangeFolder.setOnClickListener(v -> changeDir());
+
         TextView tvTitle = titleView.findViewById(R.id.tvFileTitle);
-        String selectFileCaption = getContext().getResources().getString(R.string.title_select_file);
+        String selectFileCaption = new SafFile(getContext(), getBaseUri()).getName();
         tvTitle.setText(selectFileCaption);
 
         return titleView;
+    }
+
+    private void changeDir() {
+        if (saveFileDialog != null) {
+            saveFileDialog.dismiss();
+        }
+        if (openFileDialog != null) {
+            openFileDialog.dismiss();
+        }
+        openSaf();
     }
 
     private ArrayAdapter<RowItem> createListAdapter(List<RowItem> items) {
@@ -429,6 +452,11 @@ public class FileDialog implements IFileDialog {
 
         public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.setFilterFileExt(filterFileExt);
+            return this;
+        }
+
+        public Builder setFileName(String fileName) {
+            FileDialog.this.setFileName(fileName);
             return this;
         }
 

@@ -40,7 +40,9 @@ public class SafFile {
     public String getName() {
         Activity activity = activityRef.get();
         if (uri != null && activity != null) {
-            return DocumentFile.fromTreeUri(activity, uri).getName();
+            DocumentFile documentFile = DocumentFile.fromTreeUri(activity, uri);
+            if (documentFile != null)
+                return documentFile.getName();
         }
 
         return null;

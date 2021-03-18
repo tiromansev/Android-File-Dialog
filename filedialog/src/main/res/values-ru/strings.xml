@@ -1,25 +1,11 @@
 <resources>
     <string name="caption_ok">ОК</string>
     <string name="message_file_must_be_selected">Необходимо выбрать файл!</string>
-    <string name="message_directory_must_be_selected">Необходимо выбрать папку!</string>
-    <string name="title_select_file">Выбрать файл</string>
-    <string name="message_write_permission_denied">Отсутствует доступ на запись!</string>
     <string name="message_get_dir_content_error">Обнаружена ошибка получения содержимого папки</string>
-    <string name="n_bytes">%d bytes</string>
-    <string name="n_kilobytes">%d KiB</string>
-    <string name="n_megabytes">%5.2f MiB</string>
-    <string name="n_megabytes10">%5.1f MiB</string>
-    <string name="n_megabytes100">%d MiB</string>
-    <string name="n_gigabytes">%5.2f GiB</string>
-    <string name="n_gigabytes10">%5.1f GiB</string>
-    <string name="n_gigabytes100">%d GiB</string>
-    <string name="dir_name_size_num_dirs">%1$s (%2$s, %3$d dirs)</string>
-    <string name="dir_empty">%s (empty)</string>
-    <string name="dir_name_size">%1$s (%2$s)</string>
-    <string name="caption_use_dir">Продолжить</string>
-    <string name="caption_select_other">Выбрать другую</string>
-    <string name="message_selected_file_dialog_base_dir">Использовать выбранную ранее папку %1$s или выбрать другую?</string>
     <string name="message_saf_use_rationale">В связи с ограничениями по доступу к картам памяти введенному компанией Гугл Вам необходимо выбрать папку
         в которую приложение сможет сохранять файлы!</string>
     <string name="title_warning">Внимание!</string>
+    <string name="message_file_name_is_empty">Необходимо указать имя файла!</string>
+    <string name="message_file_create_failed">Обнаружена ошибка создания файла!</string>
+    <string name="caption_file_name">Имя файла</string>
 </resources>

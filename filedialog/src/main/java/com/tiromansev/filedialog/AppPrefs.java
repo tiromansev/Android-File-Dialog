@@ -5,7 +5,7 @@ import com.tiromansev.prefswrapper.typedprefs.StringPreference;
 
 public class AppPrefs {
 
-    public static StringPreference initialPath() {
+    public static StringPreference basePath() {
         return StringPreference.
                 builder("preferences_file_dialog_initial_path")
                 .setDefaultValue("")
