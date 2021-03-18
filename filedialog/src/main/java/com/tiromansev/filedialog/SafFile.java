@@ -1,7 +1,6 @@
 package com.tiromansev.filedialog;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -12,12 +11,11 @@ import java.lang.ref.WeakReference;
 
 public class SafFile {
 
-    private Uri uri;
-    private WeakReference<Activity> activityRef;
+    private final Uri uri;
+    private final WeakReference<Activity> activityRef;
 
     public SafFile(Activity context, Uri uri) {
         this.activityRef = new WeakReference<>(context);
-        context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         this.uri = uri;
     }
 

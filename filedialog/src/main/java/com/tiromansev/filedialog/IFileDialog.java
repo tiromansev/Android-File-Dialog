@@ -38,8 +38,7 @@ public interface IFileDialog {
 
     /**
      * показывает диалог
-     * @param directory строковое значение абсолютного пути к папке которую нужно открывать при показе окна диалога
      */
-    void show(String directory);
+    void show();
 
 }

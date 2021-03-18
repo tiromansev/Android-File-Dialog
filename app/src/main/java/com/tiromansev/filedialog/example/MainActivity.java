@@ -22,13 +22,12 @@ public class MainActivity extends AppCompatActivity {
         Button btnOpenDialog = findViewById(R.id.btnOpenDialog);
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = FileDialog.create(MainActivity.this)
-                    .setCanExplore(true)
                     .setSelectType(FileDialog.FILE_OPEN)
                     .setAddModifiedDate(true)
                     .setFileDialogListener(file ->
                             GuiUtils.showMessage(MainActivity.this, file.getFilePath()))
                     .build();
-            fileDialog.show(getExternalFilesDir(null).getAbsolutePath());
+            fileDialog.show();
         });
     }
 

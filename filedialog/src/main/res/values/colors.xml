@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="file_dialog_color">#3F51B5</color>
-    <color name="bread_crumbs_color">#3F51B5</color>
     <color name="color_white">#ffffff</color>
     <color name="color_black">#000000</color>
     <color name="transparent">#00000000</color>
-    <color name="secondary_text">#727272</color>
     <color name="button_focused_color_start">#cccccc</color>
 </resources>

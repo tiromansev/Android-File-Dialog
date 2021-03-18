@@ -2,43 +2,13 @@ package com.tiromansev.filedialog.utils;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.tiromansev.filedialog.BaseCallback;
 import com.tiromansev.filedialog.R;
 
 public class DialogUtils {
-
-    public static void editStringDialog(final Activity context,
-                                        String title,
-                                        String value,
-                                        final StringValueListener valueListener) {
-        LinearLayout dialogView =
-                (LinearLayout) context.getLayoutInflater().inflate(R.layout.view_string, null);
-        final EditText edtValue = dialogView.findViewById(R.id.edtStringValue);
-        edtValue.setText(value);
-        new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
-                .setTitle(title)
-                .setCancelable(true)
-                .setView(dialogView)
-                .setPositiveButton(
-                        R.string.caption_ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (edtValue.getText().toString().isEmpty()) {
-                                    GuiUtils.showMessage(context, R.string.message_value_cannot_be_empty);
-                                }
-                                else {
-                                    valueListener.onStringValue(edtValue.getText().toString());
-                                }
-                            }
-                        })
-                .show();
-        GuiUtils.toggleSoftKeyboard(context);
-    }
 
     public static void showQuestionDialog(Activity context,
                                           String message,
@@ -56,8 +26,22 @@ public class DialogUtils {
         }
     }
 
-    public interface StringValueListener {
-        void onStringValue(String value);
+    public static void showSimpleDialog(Activity ctx,
+                                        String message,
+                                        BaseCallback okListener) {
+        showSimpleDialog(ctx, message, false, okListener);
+    }
+
+    public static void showSimpleDialog(Activity ctx,
+                                        String message,
+                                        boolean cancelable,
+                                        BaseCallback okListener) {
+        new AlertDialog.Builder(ctx, R.style.AppCompatAlertDialogStyle)
+                .setMessage(message)
+                .setTitle(R.string.title_warning)
+                .setCancelable(cancelable)
+                .setPositiveButton(
+                        ctx.getString(R.string.caption_ok), (dialog, which) -> okListener.callBackMethod()).show();
     }
 
 }

@@ -11,11 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,12 +22,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.tiromansev.filedialog.utils.ColorUtils;
-import com.tiromansev.filedialog.utils.CommonUtils;
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
-import java.io.File;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,22 +44,12 @@ public class FileDialog implements IFileDialog {
 
     public static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 9999;
 
-    private BreadCrumbs breadCrumbs;
     private int selectType = FILE_OPEN;
-
     private String[] filterFileExt;
-    private Activity context;
-    private String selectedFileName = "";
-    private boolean canExplore = true;
-    private List<String> rootDirList = new ArrayList<>();
-    private String currentDir = "";
-    private List<RowItem> subDirectories = null;
+    private final WeakReference<Activity> context;
+    private RowItem selectedFile;
     private FileDialogListener fileDialogListener = null;
-    private ArrayAdapter<RowItem> listAdapter = null;
-    private HorizontalScrollView scrollView;
-    private Comparator<RowItem> directoryComparator;
     private Comparator<RowItem> fileComparator;
-    private boolean useOldFileDialog = false;
     private HashMap<String, Integer> fileIcons = new HashMap<>();
     private boolean addModifiedDate = false;
 
@@ -73,7 +59,6 @@ public class FileDialog implements IFileDialog {
     private int browserDirectoryUpImageId = R.mipmap.ic_browser_folder_up;
     private int fileImageId = R.mipmap.ic_file;
     private int sdStorageImageId = R.mipmap.ic_sd_storage;
-    private boolean showAddFolder = true;
 
     @Override
     public void setAddModifiedDate(boolean add) {
@@ -104,28 +89,16 @@ public class FileDialog implements IFileDialog {
         this.sdStorageImageId = sdStorageImageId;
     }
 
-    public void setDirectoryComparator(Comparator<RowItem> directoryComparator) {
-        this.directoryComparator = directoryComparator;
-    }
-
     public void setFileComparator(Comparator<RowItem> fileComparator) {
         this.fileComparator = fileComparator;
     }
 
-    public void setUseOldFileDialog(boolean useOldFileDialog) {
-        this.useOldFileDialog = useOldFileDialog;
-    }
-
     public Activity getContext() {
-        return context;
+        return context.get();
     }
 
     protected int getSelectType() {
         return selectType;
-    }
-
-    protected boolean isCanExplore() {
-        return canExplore;
     }
 
     protected boolean isAddModifiedDate() {
@@ -136,16 +109,8 @@ public class FileDialog implements IFileDialog {
         return fileDialogListener;
     }
 
-    protected Comparator<RowItem> getDirectoryComparator() {
-        return directoryComparator;
-    }
-
     protected Comparator<RowItem> getFileComparator() {
         return fileComparator;
-    }
-
-    public void setShowAddFolder(boolean showAddFolder) {
-        this.showAddFolder = showAddFolder;
     }
 
     public String[] getFilterFileExt() {
@@ -161,41 +126,6 @@ public class FileDialog implements IFileDialog {
         this.filterFileExt = filterFileExt;
     }
 
-    public class RowItem {
-        private final int imageId;
-        private final String title;
-        private final String data;
-        private final long lastModified;
-
-        public RowItem(int imageId, String title, String data, long lastModified) {
-            this.imageId = imageId;
-            this.title = title;
-            this.data = data;
-            this.lastModified = lastModified;
-        }
-
-        public int getImageId() {
-            return imageId;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public long getLastModified() {
-            return lastModified;
-        }
-
-        @Override
-        public String toString() {
-            return title;
-        }
-    }
-
     private Uri getBaseUri() {
         if (!TextUtils.isEmpty(AppPrefs.initialPath().getValue())) {
             return Uri.parse(AppPrefs.initialPath().getValue());
@@ -209,44 +139,8 @@ public class FileDialog implements IFileDialog {
     }
 
     public FileDialog(Activity context) {
-        this.context = context;
-        breadCrumbs = new BreadCrumbs(context);
-        breadCrumbs.setItemClickListener(itemTag -> {
-            if (!itemTag.equals(currentDir)) {
-                String oldDir = currentDir;
-                //check we go to root dir
-                String rootDirContains = getRootDirContains(itemTag);
-                if (rootDirContains != null) {
-                    currentDir = "";
-                } else if (itemTag.equals(String.valueOf(UNDEFINED_VALUE))) {
-                    scrollView.setVisibility(View.GONE);
-                    currentDir = "";
-                } else {
-                    scrollView.setVisibility(View.VISIBLE);
-                    currentDir = itemTag;
-                }
-                if (updateDirectory()) {
-                    return true;
-                } else {
-                    currentDir = oldDir;
-                    return false;
-                }
-            }
-            return false;
-        });
-
+        this.context = new WeakReference<>(context);
         fileComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
-        directoryComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
-
-        scrollView = new HorizontalScrollView(this.context);
-        int dialogMargin = (int) this.context.getResources().getDimension(R.dimen.dialog_margin);
-        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        llp.setMargins(dialogMargin, 0, dialogMargin, 0);
-        scrollView.setLayoutParams(llp);
-        scrollView.setVerticalScrollBarEnabled(false);
-        scrollView.setHorizontalScrollBarEnabled(false);
-        initRootDirList();
     }
 
     @Override
@@ -254,62 +148,24 @@ public class FileDialog implements IFileDialog {
         this.selectType = selectType;
     }
 
-    public void setCanExplore(boolean canExplore) {
-        this.canExplore = canExplore;
-    }
-
     @Override
     public void setFileDialogListener(FileDialogListener fileDialogListener) {
         this.fileDialogListener = fileDialogListener;
     }
 
-    protected void excludeRoot(String excludedRoot, String existingRoot) {
-
-    }
-
-    private void initRootDirList() {
-        rootDirList.clear();
-        List<String> mountPoints = FileUtils.getMountPoints(context, selectType != FILE_OPEN, useOldFileDialog);
-        boolean include;
-        String path;
-        for (int i = 0; i < mountPoints.size(); i++) {
-            include = true;
-            path = mountPoints.get(i);
-            for (String mountPoint : rootDirList) {
-                if (MountPoint.calcHash(mountPoint) == MountPoint.calcHash(path)) {
-                    excludeRoot(path, mountPoint);
-                    include = false;
-                    break;
-                }
-            }
-            if (include) {
-                rootDirList.add(path);
-            }
-        }
-    }
-
-    public void show(String dir) {
-        //используем SAF
-        if (CommonUtils.isRVersion()) {
-            showSaf();
+    public void show() {
+        if (AppPrefs.showUseSafRationaleDialog().getValue()) {
+            AppPrefs.showUseSafRationaleDialog().setValue(false);
+            DialogUtils.showSimpleDialog(getContext(),
+                    getContext().getString(R.string.message_saf_use_rationale),
+                    this::showDialog);
             return;
         }
 
-        // Initial directory is sdcard directory
-//        File initDir = new File(dir);
-//        if ((dir.equals("")) || (!initDir.exists()))
-//            choose("");
-//        else {
-//            choose(dir);
-//        }
+        showDialog();
     }
 
-    private void openSaf() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        getContext().startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
-    }
-
-    private void showSaf() {
+    private void showDialog() {
         if (getBaseUri() == null) {
             openSaf();
             return;
@@ -323,13 +179,17 @@ public class FileDialog implements IFileDialog {
                 (dialog, which) -> openSaf());
     }
 
+    private void openSaf() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        getContext().startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
+    }
+
     private void handleSafAction() {
         SafFile safFile = new SafFile(getContext(), getBaseUri());
 
         if (selectType == FILE_OPEN) {
             choose(safFile);
-        }
-        else {
+        } else {
             fileDialogListener.onChosenDir(safFile);
         }
     }
@@ -338,83 +198,14 @@ public class FileDialog implements IFileDialog {
         if (fileDialogListener == null) {
             return;
         }
-        if (resultCode == RESULT_OK &&requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
             if (data != null) {
                 Uri uri = data.getData();
+                getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 setBaseUri(uri);
                 handleSafAction();
             }
         }
-    }
-
-    private void showRootDir() {
-        if (subDirectories == null) {
-            subDirectories = new ArrayList<>();
-        }
-        subDirectories.clear();
-        for (String rootDir : rootDirList) {
-            subDirectories.add(new RowItem(sdStorageImageId, new File(rootDir).getAbsolutePath(), null, 0L));
-        }
-    }
-
-    private String getRootDir(String dir) {
-        for (String rootDir : rootDirList) {
-            if (rootDir.equals(dir)) {
-                return rootDir;
-            }
-        }
-        return null;
-    }
-
-    private String getRootDirContains(String dir) {
-        for (String rootDir : rootDirList) {
-            if (dir.length() < rootDir.length() && rootDir.contains(dir)) {
-                return rootDir;
-            }
-        }
-        return null;
-    }
-
-    private void chooseClick(String sel) {
-        String mDirOld = currentDir;
-        String rootDir;
-
-        // Navigate into the sub-directory
-        if (sel.equals("..")) {
-            rootDir = getRootDir(currentDir);
-            //если переходим в корень
-            if (rootDir != null) {
-                currentDir = "";
-            } else {
-                currentDir = new File(currentDir).getParent();
-            }
-        } else {
-            rootDir = getRootDir(sel);
-            //если корень
-            if ((currentDir == null || currentDir.isEmpty()) && (rootDir != null)) {
-                currentDir = rootDir;
-            } else {
-                currentDir += "/" + sel;
-            }
-        }
-        selectedFileName = "";
-
-        File newDir;
-        try {
-            newDir = new File(currentDir);
-        } catch (Exception e) {
-            e.printStackTrace();
-            GuiUtils.showMessage(context, e.getLocalizedMessage());
-            return;
-        }
-
-        if (newDir.isFile()) // If the selection is a regular file
-        {
-            currentDir = mDirOld;
-            selectedFileName = sel;
-        }
-
-        updateDirectory();
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -422,33 +213,22 @@ public class FileDialog implements IFileDialog {
     // input 'dir' directory
     // //////////////////////////////////////////////////////////////////////////////
     private void choose(SafFile safFile) {
-//        File dirFile = new File(dir);
-
-//        if (!dirFile.exists() || !dirFile.isDirectory()) {
-//            showRootDir();
-//        } else {
-            List<RowItem> directories = getDirectories(safFile);
-            if (directories == null) {
-                return;
-            }
-            subDirectories = directories;
-//        }
-//        currentDir = dir;
+        List<RowItem> files = getFiles(safFile);
+        if (files == null) {
+            return;
+        }
 
         class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener {
             public void onClick(DialogInterface dialog, int item) {
-                ArrayAdapter adapter = (ArrayAdapter) ((AlertDialog) dialog).getListView().getAdapter();
-                String sel = "" + adapter.getItem(item);
-//                chooseClick(sel);
-                selectedFileName = sel;
+                ArrayAdapter<RowItem> adapter = (ArrayAdapter<RowItem>) ((AlertDialog) dialog).getListView().getAdapter();
+                selectedFile = (RowItem) adapter.getItem(item);
                 adapter.notifyDataSetChanged();
             }
         }
 
         AlertDialog.Builder dialogBuilder = createDirectoryChooserDialog(
-                subDirectories, new SimpleFileDialogOnClickListener());
-        dialogBuilder.setOnCancelListener(dialogInterface -> breadCrumbs.detachFrom());
-        String okCaption = context.getResources().getString(R.string.caption_ok);
+                files, new SimpleFileDialogOnClickListener());
+        String okCaption = getContext().getResources().getString(R.string.caption_ok);
 
         dialogBuilder.setPositiveButton(
                 okCaption,
@@ -456,7 +236,7 @@ public class FileDialog implements IFileDialog {
 
         final AlertDialog dirsDialog = dialogBuilder.create();
         ListView listView = dirsDialog.getListView();
-        listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.button_focused_color_start))); // set color
+        listView.setDivider(new ColorDrawable(getContext().getResources().getColor(R.color.button_focused_color_start))); // set color
         listView.setDividerHeight(1); // set height
 
         // Show directory chooser dialog
@@ -464,51 +244,22 @@ public class FileDialog implements IFileDialog {
         dirsDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
                     if (fileDialogListener != null) {
-//                        File parentDir = new File(currentDir);
-//                        if (selectType == FILE_OPEN) {
-//                            if (selectedFileName.length() == 0) {
-//                                GuiUtils.showMessage(context, R.string.message_file_must_be_selected);
-//                                return;
-//                            }
-//                            fileDialogListener.onChosenDir(currentDir + "/" + selectedFileName);
-//                            breadCrumbs.detachFrom();
-//                            dirsDialog.dismiss();
-//                        } else {
-//                            if (!parentDir.canWrite()) {
-//                                GuiUtils.showMessage(context, R.string.message_write_permission_denied);
-//                                return;
-//                            }
-//                            fileDialogListener.onChosenDir(currentDir);
-//                            breadCrumbs.detachFrom();
-//                            dirsDialog.dismiss();
-//                        }
+                            if (selectedFile == null) {
+                                GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
+                                return;
+                            }
+                            fileDialogListener.onChosenDir(new SafFile(getContext(), selectedFile.getUri()));
+                            dirsDialog.dismiss();
                     }
                 }
         );
     }
 
-    private boolean createSubDir(String newDir) {
-        File newDirFile = new File(newDir);
-        return !newDirFile.exists() && newDirFile.mkdir();
-    }
-
-    private List<RowItem> getDirectories(SafFile safFile) {
-//        List<RowItem> dirs = new ArrayList<>();
+    private List<RowItem> getFiles(SafFile safFile) {
         List<RowItem> files = new ArrayList<>();
-        List<RowItem> result;
 
-//        File dirFile = new File(dir);
         try {
-//            if (!dirFile.exists() || !dirFile.isDirectory()) {
-//                return dirs;
-//            }
-
             for (DocumentFile file : safFile.getFile().listFiles()) {
-//                if (file.isDirectory() && canExplore) {
-//                    RowItem item = new RowItem(file.canWrite() ? browserDirectoryImageId :
-//                            browserDirectoryLockImageId, file.getName(), null, file.lastModified());
-//                    dirs.add(item);
-//                } else if (selectType == FILE_OPEN) {
                 if (file.isFile()) {
                     boolean exclude = false;
                     if (filterFileExt != null && filterFileExt.length > 0) {
@@ -534,34 +285,26 @@ public class FileDialog implements IFileDialog {
                     if (fileIcons.size() > 0) {
                         for (Map.Entry<String, Integer> entry : fileIcons.entrySet()) {
                             if (file.getName().endsWith(entry.getKey())) {
-                                item = new RowItem(entry.getValue(), file.getName(), data, file.lastModified());
+                                item = new RowItem(entry.getValue(), file.getName(), data, file.lastModified(), file.getUri());
                                 files.add(item);
                                 break;
                             }
                         }
                     }
                     if (item == null) {
-                        item = new RowItem(fileImageId, file.getName(), data, file.lastModified());
+                        item = new RowItem(fileImageId, file.getName(), data, file.lastModified(), file.getUri());
                         files.add(item);
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            GuiUtils.showMessage(context, R.string.message_get_dir_content_error);
+            GuiUtils.showMessage(getContext(), R.string.message_get_dir_content_error);
             return null;
         }
 
-//        Collections.sort(dirs, directoryComparator);
         Collections.sort(files, fileComparator);
-
-        result = new ArrayList<>();
-//        if (dirFile.getParentFile() != null && canExplore) {
-//            result.add(new RowItem(browserDirectoryUpImageId, "..", null, 0L));
-//        }
-//        result.addAll(dirs);
-        result.addAll(files);
-        return result;
+        return new ArrayList<>(files);
     }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -570,137 +313,48 @@ public class FileDialog implements IFileDialog {
     private AlertDialog.Builder createDirectoryChooserDialog(
             List<RowItem> listItems,
             DialogInterface.OnClickListener onClickListener) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
 
         // ///////////////////////////////////////////////////
         // Create View with folder path and entry text box //
         // ///////////////////////////////////////////////////
-        LinearLayout titleLayout = new LinearLayout(context);
+        LinearLayout titleLayout = new LinearLayout(getContext());
         titleLayout.setOrientation(LinearLayout.VERTICAL);
         titleLayout.setBackgroundResource(R.drawable.bottom_border);
 
         titleLayout.addView(createTitleLayout());
-        getBreadCrumb();
-        titleLayout.addView(scrollView);
-        titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, context));
+        titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
 
         // ////////////////////////////////////////
         // Set Views and Finish Dialog builder //
         // ////////////////////////////////////////
         dialogBuilder.setCustomTitle(titleLayout);
-        if (selectType == FILE_OPEN)
-            dialogBuilder.setTitle(R.string.title_select_file);
-        if (selectType == FOLDER_CHOOSE)
-            dialogBuilder.setTitle(R.string.caption_folder_select);
-        listAdapter = createListAdapter(listItems);
-        dialogBuilder.setSingleChoiceItems(listAdapter, -1, onClickListener);
+        dialogBuilder.setTitle(R.string.title_select_file);
+        dialogBuilder.setSingleChoiceItems(createListAdapter(listItems), -1, onClickListener);
         dialogBuilder.setCancelable(true);
         return dialogBuilder;
     }
 
     private View createTitleLayout() {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         View titleView = inflater.inflate(R.layout.view_file_dialog_title, null);
 
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        int dialogMargin = (int) context.getResources().getDimension(R.dimen.dialog_margin);
-        int dialogBottomMargin = (int) context.getResources().getDimension(R.dimen.dialog_bottom_margin);
+        int dialogMargin = (int) getContext().getResources().getDimension(R.dimen.dialog_margin);
+        int dialogBottomMargin = (int) getContext().getResources().getDimension(R.dimen.dialog_bottom_margin);
         titleParams.setMargins(dialogMargin, dialogMargin, dialogMargin, dialogBottomMargin);
         titleView.setLayoutParams(titleParams);
 
         TextView tvTitle = titleView.findViewById(R.id.tvFileTitle);
-        ImageButton addFolder = titleView.findViewById(R.id.btnAddFolder);
-        addFolder.setImageResource(addDirectoryImageId);
-        final String newFolder = context.getResources().getString(R.string.caption_new_folder_name);
-        final String failedToCreateFolder = context.getResources().getString(R.string.message_failed_to_create_folder);
-        addFolder.setOnClickListener(view -> DialogUtils.editStringDialog(context,
-                newFolder,
-                "",
-                value -> {
-                    // Create new directory
-                    if (createSubDir(currentDir + "/" + value)) {
-                        currentDir += "/" + value;
-                        updateDirectory();
-                    } else {
-                        GuiUtils.showMessage(context, failedToCreateFolder.concat(" '").concat(value).concat("'"));
-                    }
-                }));
-        addFolder.setVisibility((selectType == FOLDER_CHOOSE) && showAddFolder ? View.VISIBLE : View.GONE);
-        String selectFileCaption = context.getResources().getString(R.string.title_select_file);
-        String folderSelectCaption = context.getResources().getString(R.string.caption_folder_select);
-
-        switch (selectType) {
-            case FOLDER_CHOOSE:
-                tvTitle.setText(folderSelectCaption);
-                break;
-            default:
-                tvTitle.setText(selectFileCaption);
-                break;
-        }
+        String selectFileCaption = getContext().getResources().getString(R.string.title_select_file);
+        tvTitle.setText(selectFileCaption);
 
         return titleView;
     }
 
-    private void getBreadCrumb() {
-        if (canExplore) {
-            String[] dirs = currentDir.split("/");
-            scrollView.removeAllViews();
-            scrollView.setVisibility(View.VISIBLE);
-            breadCrumbs.attachTo(scrollView);
-            breadCrumbs.clearItems();
-            String tag = "";
-            if (dirs.length > 0) {
-                for (int i = 0; i < dirs.length; i++) {
-                    if (!dirs[i].isEmpty()) {
-                        if (tag.isEmpty()) {
-                            breadCrumbs.addHomeItem(dirs[i]);
-                            tag = tag + "/" + dirs[i];
-                        } else {
-                            tag = tag + "/" + dirs[i];
-                            breadCrumbs.addItem(dirs[i], tag);
-                        }
-                    }
-                }
-            }
-            scrollView.setVisibility(breadCrumbs.getItemCount() > 0 ? View.VISIBLE : View.GONE);
-        } else {
-            scrollView.setVisibility(View.GONE);
-        }
-    }
-
-    private boolean updateDirectory() {
-//        if (currentDir == null || currentDir.isEmpty()) {
-//            showRootDir();
-//        } else {
-//            List<RowItem> directories = getDirectories(currentDir);
-//            if (directories == null) {
-//                return false;
-//            }
-//            subDirectories.clear();
-//            subDirectories.addAll(directories);
-//        }
-//        String fileName = "";
-//        // #scorch
-//        if (selectType == FILE_OPEN) {
-//            fileName = selectedFileName;
-//        }
-//        File file = new File(currentDir + "/" + fileName);
-//        if (!file.isFile()) {
-//            getBreadCrumb();
-//        }
-//        listAdapter.notifyDataSetChanged();
-        return true;
-    }
-
-    private class ViewHolder {
-        ImageView imageView;
-        TextView txtTitle;
-        TextView txtData;
-    }
-
     private ArrayAdapter<RowItem> createListAdapter(List<RowItem> items) {
-        return new ArrayAdapter<RowItem>(context,
+        return new ArrayAdapter<RowItem>(getContext(),
                 R.layout.view_file_dialog_item, items) {
 
             @Override
@@ -709,7 +363,7 @@ public class FileDialog implements IFileDialog {
                 RowItem rowItem = getItem(position);
                 RelativeLayout rlDirItem;
 
-                LayoutInflater mInflater = (LayoutInflater) context
+                LayoutInflater mInflater = (LayoutInflater) getContext()
                         .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
                 if (convertView == null) {
                     convertView = mInflater.inflate(R.layout.view_file_dialog_item, null);
@@ -732,14 +386,14 @@ public class FileDialog implements IFileDialog {
                 } else {
                     holder.imageView.setImageBitmap(null);
                 }
-                if (rowItem.getTitle().equals(selectedFileName)) {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, context));
-                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, context));
-                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, context));
+                if (selectedFile != null && rowItem.getTitle().equals(selectedFile.getTitle())) {
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
+                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
+                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
                 } else {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_background, context));
-                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, context));
-                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, context));
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_background, getContext()));
+                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
+                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
                 }
 
                 return convertView;
@@ -763,11 +417,6 @@ public class FileDialog implements IFileDialog {
             return this;
         }
 
-        public Builder setCanExplore(boolean mCanExplore) {
-            FileDialog.this.canExplore = mCanExplore;
-            return this;
-        }
-
         public Builder setAddModifiedDate(boolean add) {
             FileDialog.this.setAddModifiedDate(add);
             return this;
@@ -780,11 +429,6 @@ public class FileDialog implements IFileDialog {
 
         public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.setFilterFileExt(filterFileExt);
-            return this;
-        }
-
-        public Builder setDirectoryComparator(Comparator<RowItem> directoryComparator) {
-            FileDialog.this.setDirectoryComparator(directoryComparator);
             return this;
         }
 
