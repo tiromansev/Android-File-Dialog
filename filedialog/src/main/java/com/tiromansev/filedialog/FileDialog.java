@@ -166,9 +166,9 @@ public class FileDialog implements IFileDialog {
         SafFile safFile = new SafFile(getContext(), getBaseUri());
 
         if (selectType == FILE_OPEN)
-            selectFile(safFile);
+            openFile(safFile);
         else
-            selectFolder(safFile);
+            saveFile(safFile);
     }
 
     public void handleRequestResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -186,7 +186,7 @@ public class FileDialog implements IFileDialog {
         }
     }
 
-    private void selectFolder(SafFile safFile) {
+    private void saveFile(SafFile safFile) {
         AlertDialog.Builder dialogBuilder = createFileSaveDialog();
         LinearLayout dialogView =
                 (LinearLayout) getContext().getLayoutInflater().inflate(R.layout.view_save_file, null);
@@ -219,7 +219,7 @@ public class FileDialog implements IFileDialog {
         );
     }
 
-    private void selectFile(SafFile safFile) {
+    private void openFile(SafFile safFile) {
         List<RowItem> files = getFiles(safFile);
         if (files == null) {
             return;

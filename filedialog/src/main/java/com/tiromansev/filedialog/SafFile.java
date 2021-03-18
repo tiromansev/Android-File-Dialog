@@ -5,8 +5,6 @@ import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import com.tiromansev.filedialog.utils.FileUtils;
-
 import java.lang.ref.WeakReference;
 
 public class SafFile {
@@ -17,15 +15,6 @@ public class SafFile {
     public SafFile(Activity context, Uri uri) {
         this.activityRef = new WeakReference<>(context);
         this.uri = uri;
-    }
-
-    public String getFilePath() {
-        Activity activity = activityRef.get();
-        if (uri != null && activity != null) {
-            return FileUtils.getFilePathFromUri(activity, uri);
-        }
-
-        return null;
     }
 
     public DocumentFile getFile() {

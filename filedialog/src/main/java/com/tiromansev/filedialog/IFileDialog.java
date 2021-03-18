@@ -8,7 +8,7 @@ package com.tiromansev.filedialog;
 public interface IFileDialog {
 
     public static final int FILE_OPEN = 0;
-    public static final int FOLDER_CHOOSE = 1;
+    public static final int FILE_SAVE = 1;
 
     /**
      * устанавливает тип диалога
