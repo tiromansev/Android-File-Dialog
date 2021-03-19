@@ -190,6 +190,8 @@ public class FileDialog implements IFileDialog {
         AlertDialog.Builder dialogBuilder = createFileSaveDialog();
         LinearLayout dialogView =
                 (LinearLayout) getContext().getLayoutInflater().inflate(R.layout.view_save_file, null);
+        RelativeLayout rlFileName = dialogView.findViewById(R.id.rlFileName);
+        rlFileName.setVisibility(selectType == FOLDER_CHOOSE ? View.GONE : View.VISIBLE);
         EditText edtFileName = dialogView.findViewById(R.id.edtFileName);
         edtFileName.setText(fileName);
         dialogBuilder.setView(dialogView);
@@ -202,17 +204,22 @@ public class FileDialog implements IFileDialog {
         saveFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
                     if (fileDialogListener != null) {
-                        String fileName = edtFileName.getText().toString();
-                        if (TextUtils.isEmpty(fileName)) {
-                            GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
-                            return;
+                        if (selectType == FOLDER_CHOOSE) {
+                            fileDialogListener.onFileResult(getBaseUri());
                         }
-                        DocumentFile result = safFile.getFile().createFile("*/*", fileName);
-                        if (result == null) {
-                            GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
-                            return;
+                        else {
+                            String fileName = edtFileName.getText().toString();
+                            if (TextUtils.isEmpty(fileName)) {
+                                GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
+                                return;
+                            }
+                            DocumentFile result = safFile.getFile().createFile("*/*", fileName);
+                            if (result == null) {
+                                GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
+                                return;
+                            }
+                            fileDialogListener.onFileResult(result.getUri());
                         }
-                        fileDialogListener.onFileResult(result.getUri());
                         saveFileDialog.dismiss();
                     }
                 }
