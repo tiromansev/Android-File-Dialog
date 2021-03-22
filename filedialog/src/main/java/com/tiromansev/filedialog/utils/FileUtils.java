@@ -1,13 +1,19 @@
 package com.tiromansev.filedialog.utils;
 
-import android.app.Activity;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.text.DecimalFormat;
 
 public class FileUtils {
 
-    public static String getInternalAppDir(Activity context) {
-        return context.getFilesDir().getAbsolutePath() + "/";
+    public static DocumentFile getDocumentFile(DocumentFile documentFile, String fileName) {
+        DocumentFile result = documentFile.findFile(fileName);
+
+        if (result == null) {
+            return documentFile.createFile("*/*", fileName);
+        }
+
+        return result;
     }
 
     public static String size(long size) {

@@ -213,7 +213,7 @@ public class FileDialog implements IFileDialog {
                                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                                 return;
                             }
-                            DocumentFile result = safFile.getFile().createFile("*/*", fileName);
+                            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName);
                             if (result == null) {
                                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                                 return;
