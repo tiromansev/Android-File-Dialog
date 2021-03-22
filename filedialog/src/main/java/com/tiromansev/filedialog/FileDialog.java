@@ -109,7 +109,7 @@ public class FileDialog implements IFileDialog {
         this.filterFileExt = filterFileExt;
     }
 
-    public Uri getBaseUri() {
+    public static Uri getBaseUri() {
         if (!TextUtils.isEmpty(AppPrefs.basePath().getValue())) {
             return Uri.parse(AppPrefs.basePath().getValue());
         }
