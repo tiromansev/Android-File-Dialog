@@ -11,6 +11,8 @@
         <item name="file_dialog_background">@color/color_white</item>
         <item name="file_dialog_dir_item_color">@color/colorPrimary</item>
         <item name="file_dialog_selected_dir_item_color">@color/color_white</item>
+        <item name="file_dialog_selected_item_background">@color/colorItemSelected</item>
+        <item name="file_dialog_item_background">@color/colorItem</item>
     </style>
 
 </resources>

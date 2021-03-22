@@ -417,11 +417,11 @@ public class FileDialog implements IFileDialog {
                     holder.imageView.setImageBitmap(null);
                 }
                 if (selectedFile != null && rowItem.getTitle().equals(selectedFile.getTitle())) {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_item_background, getContext()));
                     holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
                     holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
                 } else {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_background, getContext()));
+                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_item_background, getContext()));
                     holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
                     holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
                 }
