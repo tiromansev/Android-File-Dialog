@@ -167,6 +167,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
 
     private void openSaf() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
         getContext().startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
     }
 
