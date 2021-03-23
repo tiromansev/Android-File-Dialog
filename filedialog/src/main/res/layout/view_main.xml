@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal|center_vertical"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rlFies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/pkProgress"
+        android:layout_width="@dimen/progress_size"
+        android:layout_height="@dimen/progress_size"
+        android:layout_gravity="center"
+        app:SpinKit_Color="?attr/file_dialog_progress_color"
+        style="@style/SpinKitView.Circle"
+        android:layout_margin="@dimen/dialog_margin" />
+</LinearLayout>

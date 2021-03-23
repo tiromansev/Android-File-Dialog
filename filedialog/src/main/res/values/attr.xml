@@ -9,4 +9,5 @@
     <attr name="file_dialog_selected_dir_item_color" format="color"/>
     <attr name="file_dialog_selected_item_background" format="color"/>
     <attr name="file_dialog_item_background" format="color"/>
+    <attr name="file_dialog_progress_color" format="color"/>
 </resources>

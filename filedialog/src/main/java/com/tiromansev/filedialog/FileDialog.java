@@ -1,48 +1,43 @@
 package com.tiromansev.filedialog;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.ybq.android.spinkit.SpinKitView;
 import com.tiromansev.filedialog.utils.ColorUtils;
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
-import static com.tiromansev.filedialog.BreadCrumbs.UNDEFINED_VALUE;
 
-public class FileDialog implements IFileDialog {
+public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener {
 
     public static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 9999;
 
@@ -58,6 +53,16 @@ public class FileDialog implements IFileDialog {
     private AlertDialog saveFileDialog;
     private int fileImageId = R.mipmap.ic_file;
     private String fileName;
+    private RecyclerView rlFiles;
+    private SpinKitView pkProgress;
+    private Disposable disposable;
+    private FileManager fileManager;
+
+    public FileDialog(Activity context) {
+        this.context = new WeakReference<>(context);
+        fileManager = new FileManager(this);
+        fileComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
+    }
 
     @Override
     public void setAddModifiedDate(boolean add) {
@@ -66,6 +71,10 @@ public class FileDialog implements IFileDialog {
 
     public void setFileImageId(int fileImageId) {
         this.fileImageId = fileImageId;
+    }
+
+    public int getFileImageId() {
+        return fileImageId;
     }
 
     public void setFileComparator(Comparator<RowItem> fileComparator) {
@@ -121,11 +130,6 @@ public class FileDialog implements IFileDialog {
         AppPrefs.basePath().setValue(uri.toString());
     }
 
-    public FileDialog(Activity context) {
-        this.context = new WeakReference<>(context);
-        fileComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
-    }
-
     @Override
     public void setSelectType(int selectType) {
         this.selectType = selectType;
@@ -134,6 +138,10 @@ public class FileDialog implements IFileDialog {
     @Override
     public void setFileDialogListener(FileDialogListener fileDialogListener) {
         this.fileDialogListener = fileDialogListener;
+    }
+
+    public HashMap<String, Integer> getFileIcons() {
+        return fileIcons;
     }
 
     public void show() {
@@ -206,8 +214,7 @@ public class FileDialog implements IFileDialog {
                     if (fileDialogListener != null) {
                         if (selectType == FOLDER_CHOOSE) {
                             fileDialogListener.onFileResult(getBaseUri());
-                        }
-                        else {
+                        } else {
                             String fileName = edtFileName.getText().toString();
                             if (TextUtils.isEmpty(fileName)) {
                                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
@@ -227,30 +234,12 @@ public class FileDialog implements IFileDialog {
     }
 
     private void openFile(SafFile safFile) {
-        List<RowItem> files = getFiles(safFile);
-        if (files == null) {
-            return;
-        }
-
-        class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener {
-            public void onClick(DialogInterface dialog, int item) {
-                ArrayAdapter<RowItem> adapter = (ArrayAdapter<RowItem>) ((AlertDialog) dialog).getListView().getAdapter();
-                selectedFile = adapter.getItem(item);
-                adapter.notifyDataSetChanged();
-            }
-        }
-
-        AlertDialog.Builder dialogBuilder = createFileOpenDialog(
-                files, new SimpleFileDialogOnClickListener());
+        AlertDialog.Builder dialogBuilder = createFileOpenDialog();
         dialogBuilder.setPositiveButton(R.string.caption_ok, null);
 
         openFileDialog = dialogBuilder.create();
-        ListView listView = openFileDialog.getListView();
-        listView.setDivider(new ColorDrawable(getContext().getResources().getColor(R.color.button_focused_color_start))); // set color
-        listView.setDividerHeight(1); // set height
-
-        // Show directory chooser dialog
         openFileDialog.show();
+        openFileDialog.setOnCancelListener(dialog -> unsubscribe());
         openFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
                     if (fileDialogListener != null) {
@@ -260,63 +249,43 @@ public class FileDialog implements IFileDialog {
                         }
                         fileDialogListener.onFileResult(selectedFile.getUri());
                         openFileDialog.dismiss();
+                        unsubscribe();
                     }
                 }
         );
+
+        showProgress();
+        addSubscription(fileManager.getFilesAsync(safFile)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnDispose(this::closeProgress)
+                .subscribe(rowItems -> {
+                    setFileList(rowItems);
+                    closeProgress();
+                }, throwable -> {
+                    closeProgress();
+                    String message = getContext().getString(R.string.message_get_dir_content_error);
+                    GuiUtils.showMessage(getContext(), message + ": " + throwable.getLocalizedMessage());
+                }));
     }
 
-    private List<RowItem> getFiles(SafFile safFile) {
-        List<RowItem> files = new ArrayList<>();
-
-        try {
-            for (DocumentFile file : safFile.getFile().listFiles()) {
-                if (file.isFile()) {
-                    boolean exclude = false;
-                    if (filterFileExt != null && filterFileExt.length > 0) {
-                        exclude = true;
-                        for (String filter : filterFileExt) {
-                            String name = file.getName();
-                            if (name != null && name.endsWith(filter)) {
-                                exclude = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (exclude) {
-                        continue;
-                    }
-                    RowItem item = null;
-                    String data = null;
-                    if (addModifiedDate) {
-                        data = FileUtils.size(file.length());
-                        Date lastModDate = new Date(file.lastModified());
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm", Locale.ENGLISH);
-                        data += dateFormat.format(lastModDate);
-                    }
-                    if (fileIcons.size() > 0) {
-                        for (Map.Entry<String, Integer> entry : fileIcons.entrySet()) {
-                            String name = file.getName();
-                            if (name != null && name.endsWith(entry.getKey())) {
-                                item = new RowItem(entry.getValue(), file.getName(), data, file.lastModified(), file.getUri());
-                                files.add(item);
-                                break;
-                            }
-                        }
-                    }
-                    if (item == null) {
-                        item = new RowItem(fileImageId, file.getName(), data, file.lastModified(), file.getUri());
-                        files.add(item);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            GuiUtils.showMessage(getContext(), R.string.message_get_dir_content_error);
-            return null;
+    private void setFileList(List<RowItem> fileList) {
+        FilesAdapter filesAdapter = new FilesAdapter(getContext(), fileList, this);
+        if (rlFiles != null) {
+            rlFiles.setAdapter(filesAdapter);
         }
+    }
 
-        Collections.sort(files, fileComparator);
-        return new ArrayList<>(files);
+    private void addSubscription(Disposable disposable) {
+        this.disposable = disposable;
+    }
+
+    private void unsubscribe() {
+        if (disposable != null) {
+            if (!disposable.isDisposed()) {
+                disposable.dispose();
+            }
+        }
     }
 
     private AlertDialog.Builder createFileSaveDialog() {
@@ -335,8 +304,25 @@ public class FileDialog implements IFileDialog {
         return dialogBuilder;
     }
 
-    private AlertDialog.Builder createFileOpenDialog(List<RowItem> listItems,
-                                                     DialogInterface.OnClickListener onClickListener) {
+    private void showProgress() {
+        if (rlFiles != null) {
+            rlFiles.setVisibility(View.GONE);
+        }
+        if (pkProgress != null) {
+            pkProgress.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void closeProgress() {
+        if (rlFiles != null) {
+            rlFiles.setVisibility(View.VISIBLE);
+        }
+        if (pkProgress != null) {
+            pkProgress.setVisibility(View.GONE);
+        }
+    }
+
+    private AlertDialog.Builder createFileOpenDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
 
         LinearLayout titleLayout = new LinearLayout(getContext());
@@ -346,8 +332,19 @@ public class FileDialog implements IFileDialog {
         titleLayout.addView(createTitleLayout());
         titleLayout.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_title_background, getContext()));
 
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View mainView = inflater.inflate(R.layout.view_main, null);
+        rlFiles = mainView.findViewById(R.id.rlFies);
+        pkProgress = mainView.findViewById(R.id.pkProgress);
+
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        rlFiles.setLayoutManager(mLayoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
+                mLayoutManager.getOrientation());
+        rlFiles.addItemDecoration(dividerItemDecoration);
+
         dialogBuilder.setCustomTitle(titleLayout);
-        dialogBuilder.setSingleChoiceItems(createListAdapter(listItems), -1, onClickListener);
+        dialogBuilder.setView(mainView);
         dialogBuilder.setCancelable(true);
         return dialogBuilder;
     }
@@ -383,57 +380,13 @@ public class FileDialog implements IFileDialog {
         openSaf();
     }
 
-    private ArrayAdapter<RowItem> createListAdapter(List<RowItem> items) {
-        return new ArrayAdapter<RowItem>(getContext(),
-                R.layout.view_file_dialog_item, items) {
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                ViewHolder holder;
-                RowItem rowItem = getItem(position);
-                RelativeLayout rlDirItem;
-
-                LayoutInflater mInflater = (LayoutInflater) getContext()
-                        .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-                if (convertView == null) {
-                    convertView = mInflater.inflate(R.layout.view_file_dialog_item, null);
-                    holder = new ViewHolder();
-                    holder.txtTitle = convertView.findViewById(R.id.tvFileItem);
-                    holder.txtData = convertView.findViewById(R.id.tvFileData);
-                    holder.imageView = convertView.findViewById(R.id.ivFileImage);
-                    convertView.setTag(holder);
-                } else {
-                    holder = (ViewHolder) convertView.getTag();
-                }
-
-                rlDirItem = convertView.findViewById(R.id.rlDirItem);
-                holder.txtTitle.setText(rowItem.getTitle());
-                holder.txtData.setText(rowItem.getData());
-                holder.txtData.setVisibility(rowItem.getData() != null ? View.VISIBLE : View.GONE);
-                holder.imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                if (rowItem.getImageId() != UNDEFINED_VALUE) {
-                    holder.imageView.setImageResource(rowItem.getImageId());
-                } else {
-                    holder.imageView.setImageBitmap(null);
-                }
-                if (selectedFile != null && rowItem.getTitle().equals(selectedFile.getTitle())) {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_item_background, getContext()));
-                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
-                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_selected_dir_item_color, getContext()));
-                } else {
-                    rlDirItem.setBackgroundColor(ColorUtils.getAttrColor(R.attr.file_dialog_item_background, getContext()));
-                    holder.txtTitle.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
-                    holder.txtData.setTextColor(ColorUtils.getAttrColor(R.attr.file_dialog_dir_item_color, getContext()));
-                }
-
-                return convertView;
-            }
-
-        };
-    }
-
     public static Builder create(Activity context) {
         return new FileDialog(context).new Builder();
+    }
+
+    @Override
+    public void onItemSelected(RowItem rowItem) {
+        selectedFile = rowItem;
     }
 
     public class Builder {
