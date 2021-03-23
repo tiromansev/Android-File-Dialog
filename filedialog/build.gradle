@@ -36,6 +36,5 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.google.android.material:material:1.2.1'//после обновления проверять работу приложения, могут быть сбои!!
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
     testImplementation 'junit:junit:4.13.1'
 }

@@ -10,6 +10,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -20,7 +21,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.ybq.android.spinkit.SpinKitView;
 import com.tiromansev.filedialog.utils.ColorUtils;
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.FileUtils;
@@ -54,7 +54,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     private int fileImageId = R.mipmap.ic_file;
     private String fileName;
     private RecyclerView rlFiles;
-    private SpinKitView pkProgress;
+    private ProgressBar pkProgress;
     private Disposable disposable;
     private FileManager fileManager;
 
