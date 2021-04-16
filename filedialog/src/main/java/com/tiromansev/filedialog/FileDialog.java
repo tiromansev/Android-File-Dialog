@@ -57,11 +57,20 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     private ProgressBar pkProgress;
     private Disposable disposable;
     private FileManager fileManager;
+    private String fileExt;
 
     public FileDialog(Activity context) {
         this.context = new WeakReference<>(context);
         fileManager = new FileManager(this);
         fileComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
+    }
+
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public void setFileExt(String fileExt) {
+        this.fileExt = fileExt;
     }
 
     @Override
@@ -218,12 +227,13 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
                         if (selectType == FOLDER_CHOOSE) {
                             fileDialogListener.onFileResult(getBaseUri());
                         } else {
+                            String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
                             String fileName = edtFileName.getText().toString();
                             if (TextUtils.isEmpty(fileName)) {
                                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                                 return;
                             }
-                            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName);
+                            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName + resultFileExt);
                             if (result == null) {
                                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                                 return;
@@ -415,6 +425,11 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
 
         public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.setFilterFileExt(filterFileExt);
+            return this;
+        }
+
+        public Builder setFileExt(String fileExt) {
+            FileDialog.this.setFileExt(fileExt);
             return this;
         }
 
