@@ -179,7 +179,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
         intent.putExtra("android.content.extra.FANCY", true);
         intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
-        getContext().startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
+        GuiUtils.tryToStartIntentFoResult(getContext(), intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
     }
 
     private void handleSafAction() {
