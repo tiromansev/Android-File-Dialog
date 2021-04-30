@@ -25,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="@dimen/file_ext_padding"
                 android:layout_alignParentStart="true"
-                android:textColor="@color/color_black"
                 android:layout_centerVertical="true"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -41,7 +40,6 @@
             android:paddingTop="@dimen/text_margin"
             android:layout_marginEnd="@dimen/breadcrumb_button_margin"
             android:lineSpacingExtra="0dp"
-            android:textColor="@color/color_black"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
