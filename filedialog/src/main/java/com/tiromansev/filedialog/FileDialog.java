@@ -213,6 +213,9 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         RelativeLayout rlFileName = dialogView.findViewById(R.id.rlFileName);
         rlFileName.setVisibility(selectType == FOLDER_CHOOSE ? View.GONE : View.VISIBLE);
         EditText edtFileName = dialogView.findViewById(R.id.edtFileName);
+        TextView edtExtension = dialogView.findViewById(R.id.edtExtension);
+        edtExtension.setVisibility(TextUtils.isEmpty(fileExt) ?  View.GONE : View.VISIBLE);
+        edtExtension.setText(fileExt);
         edtFileName.setText(fileName);
         dialogBuilder.setView(dialogView);
         dialogBuilder.setPositiveButton(R.string.caption_ok, null);
