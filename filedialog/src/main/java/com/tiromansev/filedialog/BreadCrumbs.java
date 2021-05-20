@@ -3,7 +3,6 @@ package com.tiromansev.filedialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +12,14 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
+
 import com.tiromansev.filedialog.utils.ColorUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class BreadCrumbs {
 
@@ -100,12 +100,7 @@ public class BreadCrumbs {
         button.setImageResource(R.mipmap.ic_home);
         button.setBackgroundResource(R.drawable.breadcrumb_button);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                homeClick();
-            }
-        });
+        button.setOnClickListener(view -> homeClick());
         toolbar.addView(button);
         items.put(button, items.size() + 1);
     }
@@ -223,12 +218,7 @@ public class BreadCrumbs {
         button.setPadding(buttonPadding, 0, 0, 0);
         button.setTypeface(null, Typeface.BOLD);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                itemClick(view);
-            }
-        });
+        button.setOnClickListener(this::itemClick);
         addDelimiter();
         toolbar.addView(button);
         items.put(button, items.size() + 1);
@@ -271,7 +261,7 @@ public class BreadCrumbs {
 
     public void setItems(HashMap<String, Integer> restoreItems, boolean useAttrs) {
         if (!restoreItems.isEmpty()) {
-            Map<String, Integer> sortedItems = new TreeMap<>(restoreItems);
+            Map<String, Integer> sortedItems = new HashMap<>(restoreItems);
             Set<Map.Entry<String, Integer>> set = sortedItems.entrySet();
             Iterator<Map.Entry<String, Integer>> iterator = set.iterator();
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
