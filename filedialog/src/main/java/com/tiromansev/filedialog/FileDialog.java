@@ -228,7 +228,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
                 view -> {
                     if (fileDialogListener != null) {
                         if (selectType == FOLDER_CHOOSE) {
-                            fileDialogListener.onFileResult(getBaseUri());
+                            fileDialogListener.onFileResult(getBaseUri(), null);
                         } else {
                             String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
                             String fileName = edtFileName.getText().toString();
@@ -241,7 +241,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
                                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                                 return;
                             }
-                            fileDialogListener.onFileResult(result.getUri());
+                            fileDialogListener.onFileResult(result.getUri(), fileName + resultFileExt);
                         }
                         saveFileDialog.dismiss();
                     }
@@ -263,7 +263,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
                             GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
                             return;
                         }
-                        fileDialogListener.onFileResult(selectedFile.getUri());
+                        fileDialogListener.onFileResult(selectedFile.getUri(), null);
                         openFileDialog.dismiss();
                         unsubscribe();
                     }
