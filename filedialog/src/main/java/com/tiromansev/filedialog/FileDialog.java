@@ -46,6 +46,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     private final WeakReference<Activity> context;
     private RowItem selectedFile;
     private FileDialogListener fileDialogListener = null;
+    private FileNameDialogListener fileNameDialogListener = null;
     private Comparator<RowItem> fileComparator;
     private HashMap<String, Integer> fileIcons = new HashMap<>();
     private boolean addModifiedDate = false;
@@ -106,10 +107,6 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         return addModifiedDate;
     }
 
-    protected FileDialogListener getFileDialogListener() {
-        return fileDialogListener;
-    }
-
     protected Comparator<RowItem> getFileComparator() {
         return fileComparator;
     }
@@ -147,6 +144,10 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     @Override
     public void setFileDialogListener(FileDialogListener fileDialogListener) {
         this.fileDialogListener = fileDialogListener;
+    }
+
+    public void setFileNameDialogListener(FileNameDialogListener fileNameDialogListener) {
+        this.fileNameDialogListener = fileNameDialogListener;
     }
 
     public HashMap<String, Integer> getFileIcons() {
@@ -214,7 +215,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         rlFileName.setVisibility(selectType == FOLDER_CHOOSE ? View.GONE : View.VISIBLE);
         EditText edtFileName = dialogView.findViewById(R.id.edtFileName);
         TextView edtExtension = dialogView.findViewById(R.id.edtExtension);
-        edtExtension.setVisibility(TextUtils.isEmpty(fileExt) ?  View.GONE : View.VISIBLE);
+        edtExtension.setVisibility(TextUtils.isEmpty(fileExt) ? View.GONE : View.VISIBLE);
         edtExtension.setText(fileExt);
         edtFileName.setText(fileName);
         dialogBuilder.setView(dialogView);
@@ -226,25 +227,29 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         saveFileDialog.show();
         saveFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
-                    if (fileDialogListener != null) {
-                        if (selectType == FOLDER_CHOOSE) {
-                            fileDialogListener.onFileResult(getBaseUri(), null);
-                        } else {
-                            String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
-                            String fileName = edtFileName.getText().toString();
-                            if (TextUtils.isEmpty(fileName)) {
-                                GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
-                                return;
-                            }
-                            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName + resultFileExt);
-                            if (result == null) {
-                                GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
-                                return;
-                            }
-                            fileDialogListener.onFileResult(result.getUri(), fileName + resultFileExt);
+                    if (selectType == FOLDER_CHOOSE) {
+                        if (fileDialogListener != null)
+                            fileDialogListener.onFileResult(getBaseUri());
+                        if (fileNameDialogListener != null)
+                            fileNameDialogListener.onFileResult(getBaseUri(), null);
+                    } else {
+                        String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
+                        String fileName = edtFileName.getText().toString();
+                        if (TextUtils.isEmpty(fileName)) {
+                            GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
+                            return;
                         }
-                        saveFileDialog.dismiss();
+                        DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName + resultFileExt);
+                        if (result == null) {
+                            GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
+                            return;
+                        }
+                        if (fileDialogListener != null)
+                            fileDialogListener.onFileResult(result.getUri());
+                        if (fileNameDialogListener != null)
+                            fileNameDialogListener.onFileResult(result.getUri(), fileName + resultFileExt);
                     }
+                    saveFileDialog.dismiss();
                 }
         );
     }
@@ -258,15 +263,18 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
         openFileDialog.setOnCancelListener(dialog -> unsubscribe());
         openFileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                 view -> {
-                    if (fileDialogListener != null) {
-                        if (selectedFile == null) {
-                            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
-                            return;
-                        }
-                        fileDialogListener.onFileResult(selectedFile.getUri(), null);
-                        openFileDialog.dismiss();
-                        unsubscribe();
+                    if (selectedFile == null) {
+                        GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
+                        return;
                     }
+                    if (fileDialogListener != null) {
+                        fileDialogListener.onFileResult(getBaseUri());
+                    }
+                    if (fileNameDialogListener != null) {
+                        fileNameDialogListener.onFileResult(getBaseUri(), null);
+                    }
+                    openFileDialog.dismiss();
+                    unsubscribe();
                 }
         );
 
@@ -423,6 +431,11 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
 
         public Builder setFileDialogListener(FileDialogListener listener) {
             FileDialog.this.setFileDialogListener(listener);
+            return this;
+        }
+
+        public Builder setFileNameDialogListener(FileNameDialogListener listener) {
+            FileDialog.this.setFileNameDialogListener(listener);
             return this;
         }
 

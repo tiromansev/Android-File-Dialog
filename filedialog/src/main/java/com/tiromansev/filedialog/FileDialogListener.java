@@ -4,6 +4,6 @@ import android.net.Uri;
 
 public interface FileDialogListener {
 
-    void onFileResult(Uri uri, String fileName);
+    void onFileResult(Uri uri);
 
 }
