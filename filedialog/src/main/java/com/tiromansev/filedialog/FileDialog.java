@@ -193,7 +193,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     }
 
     public void handleRequestResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (fileDialogListener == null) {
+        if (fileDialogListener == null && fileNameDialogListener == null) {
             return;
         }
         if (resultCode == RESULT_OK && requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
