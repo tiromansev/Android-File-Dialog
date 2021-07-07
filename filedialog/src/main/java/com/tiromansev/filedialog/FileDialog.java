@@ -271,7 +271,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
                         fileDialogListener.onFileResult(selectedFile.getUri());
                     }
                     if (fileNameDialogListener != null) {
-                        fileNameDialogListener.onFileResult(selectedFile.getUri(), null);
+                        fileNameDialogListener.onFileResult(selectedFile.getUri(), selectedFile.getTitle());
                     }
                     openFileDialog.dismiss();
                     unsubscribe();
