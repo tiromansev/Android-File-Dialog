@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
                     .setFileName("new_file_name")
                     .setFileExt(".txt")
                     .setAddModifiedDate(true)
-                    .setFileDialogListener((uri, fileName) ->
+                    .setFileDialogListener((uri) ->
                             GuiUtils.showMessage(MainActivity.this, uri.toString()))
                     .build();
             fileDialog.show();
