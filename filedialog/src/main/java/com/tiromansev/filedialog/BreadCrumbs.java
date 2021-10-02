@@ -276,10 +276,6 @@ public class BreadCrumbs {
                 addItem(entry.getKey(), String.valueOf(entry.getValue()), useAttrs);
             }
         }
-        else {
-            if (items.isEmpty())
-                setToolbarVisible(false);
-        }
     }
 
     public void restoreState(Bundle inState, String tag) {
