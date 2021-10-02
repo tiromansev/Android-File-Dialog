@@ -285,17 +285,7 @@ public class BreadCrumbs {
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
             HashMap<String, Integer> restoreItems = (HashMap<String, Integer>) inState.getSerializable(tag);
-            HashMap<String, Integer> resultItems = new HashMap<>();
-
-            List<Map.Entry<String, Integer>> list = new ArrayList<>(restoreItems.entrySet());
-            Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-
-            for (Map.Entry<String, Integer> entry: list) {
-                Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
-                resultItems.put(entry.getKey(), entry.getValue());
-            }
-
-            setItems(resultItems);
+            setItems(restoreItems);
         }
     }
 
