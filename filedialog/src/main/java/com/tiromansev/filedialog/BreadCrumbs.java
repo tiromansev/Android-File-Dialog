@@ -3,6 +3,7 @@ package com.tiromansev.filedialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.tiromansev.filedialog.utils.ColorUtils;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class BreadCrumbs {
 
@@ -251,7 +256,17 @@ public class BreadCrumbs {
     }
 
     public void saveState(Bundle outState, String tag) {
-        outState.putSerializable(tag, getItems());
+        HashMap<String, Integer> saveItems = new HashMap<>();
+
+        if (!items.isEmpty()) {
+            int i = 0;
+
+            for (Map.Entry<String, Integer> entry : getItems().entrySet()) {
+                saveItems.put(i + "@" + entry.getKey(), entry.getValue());
+                i++;
+            }
+        }
+        outState.putSerializable(tag, saveItems);
     }
 
     public void saveState(Bundle outState) {
@@ -282,7 +297,22 @@ public class BreadCrumbs {
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
             HashMap<String, Integer> restoreItems = (HashMap<String, Integer>) inState.getSerializable(tag);
-            setItems(restoreItems);
+            Map<String, Integer> sorted = new TreeMap<>(restoreItems);
+            HashMap<String, Integer> resultItems = new HashMap<>();
+
+            try {
+                for (Map.Entry<String, Integer> entry : sorted.entrySet()) {
+                    String key = entry.getKey();
+                    if (!TextUtils.isEmpty(key)) {
+                        key = key.substring(key.indexOf("@") + 1);
+                    }
+                    resultItems.put(key, entry.getValue());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            setItems(resultItems);
         }
     }
 
