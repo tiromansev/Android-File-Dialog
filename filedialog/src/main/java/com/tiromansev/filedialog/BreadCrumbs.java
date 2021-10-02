@@ -124,10 +124,13 @@ public class BreadCrumbs {
     private void itemClick(View view) {
         boolean removeItem = true;
         if (itemClickListener != null) {
-            removeItem = itemClickListener.onItemSelect((String) view.getTag());
+            removeItem = itemClickListener.removeItem((String) view.getTag());
         }
         if (items.get(view) != null && removeItem) {
             removeRightItems(view);
+        }
+        if (itemClickListener != null) {
+            itemClickListener.onItemSelect((String) view.getTag());
         }
     }
 
@@ -295,7 +298,8 @@ public class BreadCrumbs {
     }
 
     public interface SelectItemListener {
-        boolean onItemSelect(String itemTag);
+        void onItemSelect(String itemTag);
+        boolean removeItem(String itemTag);
     }
 
 }
