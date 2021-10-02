@@ -277,6 +277,7 @@ public class BreadCrumbs {
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
             while (iterator.hasNext()) {
                 Map.Entry<String, Integer> entry = iterator.next();
+                Log.d("save_breadcrumbs", "add item id = " + entry.getKey());
                 addItem(entry.getKey(), String.valueOf(entry.getValue()), useAttrs);
             }
         }
@@ -292,7 +293,7 @@ public class BreadCrumbs {
             HashMap<String, Integer> resultItems = new HashMap<>();
 
             List<Map.Entry<String, Integer>> list = new ArrayList<>(restoreItems.entrySet());
-            Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+            Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
 
             for (Map.Entry<String, Integer> entry: list) {
                 Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
