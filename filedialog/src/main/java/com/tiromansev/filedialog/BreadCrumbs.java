@@ -295,6 +295,7 @@ public class BreadCrumbs {
             Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
 
             for (Map.Entry<String, Integer> entry: list) {
+                Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
                 resultItems.put(entry.getKey(), entry.getValue());
             }
 
