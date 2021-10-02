@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -262,6 +263,7 @@ public class BreadCrumbs {
             int i = 0;
 
             for (Map.Entry<String, Integer> entry : getItems().entrySet()) {
+                Log.d("save_breadcrumbs", "save item - " + i + "@" + entry.getKey());
                 saveItems.put(i + "@" + entry.getKey(), entry.getValue());
                 i++;
             }
@@ -306,6 +308,7 @@ public class BreadCrumbs {
                     if (!TextUtils.isEmpty(key)) {
                         key = key.substring(key.indexOf("@") + 1);
                     }
+                    Log.d("save_breadcrumbs", "restore item - " + key);
                     resultItems.put(key, entry.getValue());
                 }
             } catch (Exception e) {
