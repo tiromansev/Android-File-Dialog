@@ -154,9 +154,7 @@ public class BreadCrumbs {
     private View getLastView() {
         View lastView = null;
         int lastIndex = 0;
-        List<Map.Entry<View, Integer>> list = getSortedViewItems(items);
-
-        for (Map.Entry<View, Integer> entry : list) {
+        for (Map.Entry<View, Integer> entry : items.entrySet()) {
             if (lastView == null) {
                 lastView = entry.getKey();
                 lastIndex = entry.getValue();
@@ -265,13 +263,6 @@ public class BreadCrumbs {
 
     public void setItems(HashMap<String, Integer> restoreItems) {
         setItems(restoreItems, true);
-    }
-
-    private List<Map.Entry<View, Integer>> getSortedViewItems(HashMap<View, Integer> items) {
-        List<Map.Entry<View, Integer>> list = new ArrayList<>(items.entrySet());
-        Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-
-        return list;
     }
 
     private List<Map.Entry<String, Integer>> getSortedItems(HashMap<String, Integer> items) {
