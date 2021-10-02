@@ -154,7 +154,9 @@ public class BreadCrumbs {
     private View getLastView() {
         View lastView = null;
         int lastIndex = 0;
-        for (Map.Entry<View, Integer> entry : items.entrySet()) {
+        List<Map.Entry<View, Integer>> list = getSortedViewItems(items);
+
+        for (Map.Entry<View, Integer> entry : list) {
             if (lastView == null) {
                 lastView = entry.getKey();
                 lastIndex = entry.getValue();
@@ -265,16 +267,33 @@ public class BreadCrumbs {
         setItems(restoreItems, true);
     }
 
+    private List<Map.Entry<View, Integer>> getSortedViewItems(HashMap<View, Integer> items) {
+        List<Map.Entry<View, Integer>> list = new ArrayList<>(items.entrySet());
+        Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+
+        return list;
+    }
+
+    private List<Map.Entry<String, Integer>> getSortedItems(HashMap<String, Integer> items) {
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(items.entrySet());
+        Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+
+        return list;
+    }
+
     public void setItems(HashMap<String, Integer> restoreItems, boolean useAttrs) {
         if (!restoreItems.isEmpty()) {
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
-            List<Map.Entry<String, Integer>> list = new ArrayList<>(restoreItems.entrySet());
-            Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+            List<Map.Entry<String, Integer>> list = getSortedItems(restoreItems);
 
             for (Map.Entry<String, Integer> entry: list) {
                 Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
                 addItem(entry.getKey(), String.valueOf(entry.getValue()), useAttrs);
             }
+        }
+        else {
+            if (items.isEmpty())
+                setToolbarVisible(false);
         }
     }
 
