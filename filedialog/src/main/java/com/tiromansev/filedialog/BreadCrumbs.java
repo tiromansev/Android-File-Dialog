@@ -18,14 +18,15 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.tiromansev.filedialog.utils.ColorUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class BreadCrumbs {
 
@@ -257,18 +258,7 @@ public class BreadCrumbs {
     }
 
     public void saveState(Bundle outState, String tag) {
-        HashMap<String, Integer> saveItems = new HashMap<>();
-
-        if (!items.isEmpty()) {
-            int i = 0;
-
-            for (Map.Entry<String, Integer> entry : getItems().entrySet()) {
-                Log.d("save_breadcrumbs", "save item - " + i + "@" + entry.getKey());
-                saveItems.put(i + "@" + entry.getKey(), entry.getValue());
-                i++;
-            }
-        }
-        outState.putSerializable(tag, saveItems);
+        outState.putSerializable(tag, getItems());
     }
 
     public void saveState(Bundle outState) {
@@ -299,20 +289,13 @@ public class BreadCrumbs {
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
             HashMap<String, Integer> restoreItems = (HashMap<String, Integer>) inState.getSerializable(tag);
-            Map<String, Integer> sorted = new TreeMap<>(restoreItems);
             HashMap<String, Integer> resultItems = new HashMap<>();
 
-            try {
-                for (Map.Entry<String, Integer> entry : sorted.entrySet()) {
-                    String key = entry.getKey();
-                    if (!TextUtils.isEmpty(key)) {
-                        key = key.substring(key.indexOf("@") + 1);
-                    }
-                    Log.d("save_breadcrumbs", "restore item - " + key);
-                    resultItems.put(key, entry.getValue());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            List<Map.Entry<String, Integer>> list = new ArrayList<>(restoreItems.entrySet());
+            Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+
+            for (Map.Entry<String, Integer> entry: list) {
+                resultItems.put(entry.getKey(), entry.getValue());
             }
 
             setItems(resultItems);
