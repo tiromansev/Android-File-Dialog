@@ -3,7 +3,6 @@ package com.tiromansev.filedialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -20,13 +19,10 @@ import com.tiromansev.filedialog.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class BreadCrumbs {
 
@@ -271,13 +267,12 @@ public class BreadCrumbs {
 
     public void setItems(HashMap<String, Integer> restoreItems, boolean useAttrs) {
         if (!restoreItems.isEmpty()) {
-            Map<String, Integer> sortedItems = new HashMap<>(restoreItems);
-            Set<Map.Entry<String, Integer>> set = sortedItems.entrySet();
-            Iterator<Map.Entry<String, Integer>> iterator = set.iterator();
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
-            while (iterator.hasNext()) {
-                Map.Entry<String, Integer> entry = iterator.next();
-                Log.d("save_breadcrumbs", "add item id = " + entry.getKey());
+            List<Map.Entry<String, Integer>> list = new ArrayList<>(restoreItems.entrySet());
+            Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+
+            for (Map.Entry<String, Integer> entry: list) {
+                Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
                 addItem(entry.getKey(), String.valueOf(entry.getValue()), useAttrs);
             }
         }
