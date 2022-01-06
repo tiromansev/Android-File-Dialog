@@ -1,10 +1,10 @@
 package com.tiromansev.filedialog.utils;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
 
 import com.tiromansev.filedialog.R;
 
@@ -19,12 +19,14 @@ public class GuiUtils {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
-    public static void tryToStartIntentFoResult(Activity context, Intent intent, int requestCode) {
+    public static <I> boolean tryToStartLauncher(Context context, ActivityResultLauncher<I> launcher, I input) {
         try {
-            context.startActivityForResult(intent, requestCode);
+            launcher.launch(input);
+            return true;
         } catch (ActivityNotFoundException e) {
             e.printStackTrace();
             GuiUtils.showMessage(context, R.string.message_intent_not_have_activity);
+            return false;
         }
     }
 

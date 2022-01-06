@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -35,11 +35,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.app.Activity.RESULT_OK;
-
 public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener {
-
-    public static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 9999;
 
     private int selectType = FILE_OPEN;
     private String[] filterFileExt;
@@ -59,11 +55,16 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     private Disposable disposable;
     private FileManager fileManager;
     private String fileExt;
+    private ActivityResultLauncher<Intent> safLauncher;
 
     public FileDialog(Activity context) {
         this.context = new WeakReference<>(context);
         fileManager = new FileManager(this);
         fileComparator = (leftItem, rightItem) -> leftItem.getTitle().compareToIgnoreCase(rightItem.getTitle());
+    }
+
+    public void setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
+        this.safLauncher = safLauncher;
     }
 
     public String getFileExt() {
@@ -176,11 +177,13 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
     }
 
     private void openSaf() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-        intent.putExtra("android.content.extra.FANCY", true);
-        intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
-        GuiUtils.tryToStartIntentFoResult(getContext(), intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
+        if (safLauncher != null) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+            intent.putExtra("android.content.extra.FANCY", true);
+            intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
+            GuiUtils.tryToStartLauncher(getContext(), safLauncher, intent);
+        }
     }
 
     private void handleSafAction() {
@@ -192,18 +195,16 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
             saveFile(safFile);
     }
 
-    public void handleRequestResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void handleSafLauncherResult(Intent data) {
         if (fileDialogListener == null && fileNameDialogListener == null) {
             return;
         }
-        if (resultCode == RESULT_OK && requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
-            if (data != null) {
-                Uri uri = data.getData();
-                getContext().getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                setBaseUri(uri);
-                handleSafAction();
-            }
+        if (data != null) {
+            Uri uri = data.getData();
+            getContext().getContentResolver().takePersistableUriPermission(uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            setBaseUri(uri);
+            handleSafAction();
         }
     }
 
@@ -441,6 +442,11 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
 
         public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.setFilterFileExt(filterFileExt);
+            return this;
+        }
+
+        public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
+            FileDialog.this.setSafLauncher(safLauncher);
             return this;
         }
 
