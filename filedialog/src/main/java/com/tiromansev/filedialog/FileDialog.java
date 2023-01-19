@@ -420,46 +420,86 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
 
         }
 
+        /**
+         * устанавливает тип диалога
+         * @param selectType может иметь два значения
+         *                   FILE_OPEN - открываем диалог выбора файла
+         *                   FOLDER_CHOOSE - открываем диалог выбора папки
+         */
         public Builder setSelectType(int selectType) {
             FileDialog.this.setSelectType(selectType);
             return this;
         }
 
+        /**
+         * определяет нужно ли в окне диалога показывать дату модификации файлов
+         * @param add
+         */
         public Builder setAddModifiedDate(boolean add) {
             FileDialog.this.setAddModifiedDate(add);
             return this;
         }
 
+        /**
+         * устанавливает слушатель для выбора файла/папки, который возвращает строковое значение абсолютного пути к выбранной папки/файлу
+         * @param listener
+         */
         public Builder setFileDialogListener(FileDialogListener listener) {
             FileDialog.this.setFileDialogListener(listener);
             return this;
         }
 
+        /**
+         * устанавливает слушатель для выбора файла, который возвращает строковое значение абсолютного пути к выбранному файлу
+         * @param listener
+         */
         public Builder setFileNameDialogListener(FileNameDialogListener listener) {
             FileDialog.this.setFileNameDialogListener(listener);
             return this;
         }
 
+        /**
+         * устанавливает фильтр по mime типу для файлов в окне диалога
+         * @param filterFileExt массив mime типов
+         */
         public Builder setFilterFileExt(String[] filterFileExt) {
             FileDialog.this.setFilterFileExt(filterFileExt);
             return this;
         }
 
+        /**
+         * устанавливает обработчик возврата в активити при вызове SAF диалога выбора папки для записи
+         * (требования гугла)
+         * @param safLauncher
+         */
         public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
             FileDialog.this.setSafLauncher(safLauncher);
             return this;
         }
 
+        /**
+         * устанавливает отображаемое название расщирения файла (нередактируемый text view)
+         * @param fileExt
+         */
         public Builder setFileExt(String fileExt) {
             FileDialog.this.setFileExt(fileExt);
             return this;
         }
 
+
+        /**
+         * устанавливает дефолтное имя файла в поле ввода
+         * @param fileName
+         */
         public Builder setFileName(String fileName) {
             FileDialog.this.setFileName(fileName);
             return this;
         }
 
+        /**
+         * устанавливает сортировщик файлов
+         * @param fileComparator
+         */
         public Builder setFileComparator(Comparator<RowItem> fileComparator) {
             FileDialog.this.setFileComparator(fileComparator);
             return this;
