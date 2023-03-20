@@ -10,11 +10,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tiromansev.filedialog.FileDialog;
+import com.tiromansev.filedialog.IFileDialog;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FileDialog fileDialog;
+    private IFileDialog fileDialog;
 
     protected final ActivityResultLauncher<Intent> fileDialogLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),

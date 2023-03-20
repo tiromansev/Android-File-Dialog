@@ -505,7 +505,7 @@ public class FileDialog implements IFileDialog, FilesAdapter.ItemSelectListener 
             return this;
         }
 
-        public FileDialog build() {
+        public IFileDialog build() {
             return FileDialog.this;
         }
 

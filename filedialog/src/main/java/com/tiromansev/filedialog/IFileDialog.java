@@ -1,5 +1,7 @@
 package com.tiromansev.filedialog;
 
+import android.content.Intent;
+
 /**
  * интерфейс диалога выбора файлов и папок
  * при отображении содержимого файловой системы необходимо папки всегда отображать первыми
@@ -21,4 +23,5 @@ public interface IFileDialog {
 
     void show();
 
+    void handleSafLauncherResult(Intent data);
 }
