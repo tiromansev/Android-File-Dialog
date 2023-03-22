@@ -3,10 +3,13 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
+
 import java.lang.ref.WeakReference;
 
 public class SafDialog implements IFileDialog {
@@ -38,6 +41,12 @@ public class SafDialog implements IFileDialog {
     }
 
     public void setMimeType(String mimeType) {
+        //workaround - with text/plain and text/csv csv files is document picker are grayed out
+        if (mimeType.equals("text/plain") || mimeType.equals("text/csv")) {
+            this.mimeType = "text/comma-separated-values";
+            return;
+        }
+
         this.mimeType = mimeType;
     }
 
