@@ -19,6 +19,7 @@ public class SafDialog implements IFileDialog {
     private ActivityResultLauncher<Intent> safLauncher;
     private int selectType = FILE_OPEN;
     private String mimeType;
+    private String fileName;
 
     public SafDialog(Activity context) {
         this.context = new WeakReference<>(context);
@@ -41,7 +42,7 @@ public class SafDialog implements IFileDialog {
     }
 
     public void setMimeType(String mimeType) {
-        //workaround - with text/plain and text/csv csv files is document picker are grayed out
+        //workaround - with text/plain and text/csv csv files in document picker are grayed out
         if (mimeType.equals("text/plain") || mimeType.equals("text/csv")) {
             this.mimeType = "text/comma-separated-values";
             return;
@@ -77,25 +78,28 @@ public class SafDialog implements IFileDialog {
     }
 
     private void launchSaf() {
-        if (safLauncher != null) {
-            switch (selectType) {
-                case FILE_OPEN:
-                    GuiUtils.tryToStartLauncher(getContext(), safLauncher, openFileIntent());
-                    break;
-                case FOLDER_CHOOSE:
-                    GuiUtils.tryToStartLauncher(getContext(), safLauncher, chooseFolderIntent());
-                    break;
-            }
+        if (safLauncher == null) {
+            return;
+        }
+
+        switch (selectType) {
+            case FILE_OPEN:
+                GuiUtils.tryToStartLauncher(getContext(), safLauncher, openFileIntent());
+                break;
+            case FOLDER_CHOOSE:
+                GuiUtils.tryToStartLauncher(getContext(), safLauncher, chooseFolderIntent());
+                break;
+
+            case FILE_SAVE:
+                GuiUtils.tryToStartLauncher(getContext(), safLauncher, createFileIntent());
+                break;
         }
     }
 
     @NonNull
     private Intent chooseFolderIntent() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-        intent.putExtra("android.content.extra.FANCY", true);
-        intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
-        return intent;
+        return applyCommonSettings(intent);
     }
 
     @NonNull
@@ -103,6 +107,19 @@ public class SafDialog implements IFileDialog {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
+        return applyCommonSettings(intent);
+    }
+
+    @NonNull
+    private Intent createFileIntent() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        return applyCommonSettings(intent);
+    }
+
+    private Intent applyCommonSettings(Intent intent) {
         intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
         intent.putExtra("android.content.extra.FANCY", true);
         intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
@@ -138,6 +155,16 @@ public class SafDialog implements IFileDialog {
     public class Builder {
 
         public Builder() {
+        }
+
+        /**
+         * устанавливает дефолтное имя файла в поле ввода
+         *
+         * @param fileName
+         */
+        public Builder setFileName(String fileName) {
+            SafDialog.this.fileName = fileName;
+            return this;
         }
 
         /**

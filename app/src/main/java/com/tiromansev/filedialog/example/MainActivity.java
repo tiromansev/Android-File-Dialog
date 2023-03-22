@@ -48,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = SafDialog.create(MainActivity.this)
-                    .setSelectType(FileDialog.FILE_OPEN)
+                    .setSelectType(FileDialog.FILE_SAVE)
                     .setMimeType("text/plain")
+                    .setFileName("1234567")
                     //.setMimeType("application/vnd.ms-excel")
                     .setSafLauncher(fileDialogLauncher)
                     .setFileDialogListener((uri) ->
