@@ -1,5 +1,8 @@
 package com.tiromansev.filedialog.utils;
 
+import android.content.Context;
+import android.net.Uri;
+
 import androidx.documentfile.provider.DocumentFile;
 
 import java.text.DecimalFormat;
@@ -40,4 +43,16 @@ public class FileUtils {
         return hrSize;
     }
 
+    public static String getFileName(Context context, Uri uri) {
+        if (uri == null) {
+            return "";
+        }
+
+        DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+        if (documentFile == null) {
+            return "";
+        }
+
+        return documentFile.getName();
+    }
 }
