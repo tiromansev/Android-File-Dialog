@@ -3,24 +3,21 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
-
 import java.lang.ref.WeakReference;
 
-public class PickSafFile implements IFileDialog {
+public class SafDialog implements IFileDialog {
 
     private final WeakReference<Activity> context;
     private FileDialogListener fileDialogListener = null;
-    private String mimeType;
     private ActivityResultLauncher<Intent> safLauncher;
     private int selectType = FILE_OPEN;
+    private String mimeType;
 
-    public PickSafFile(Activity context) {
+    public SafDialog(Activity context) {
         this.context = new WeakReference<>(context);
     }
 
@@ -63,14 +60,14 @@ public class PickSafFile implements IFileDialog {
             AppPrefs.showUseSafRationaleDialog().setValue(false);
             DialogUtils.showSimpleDialog(getContext(),
                     getContext().getString(R.string.message_saf_use_rationale),
-                    this::openSaf);
+                    this::launchSaf);
             return;
         }
 
-        openSaf();
+        launchSaf();
     }
 
-    private void openSaf() {
+    private void launchSaf() {
         if (safLauncher != null) {
             switch (selectType) {
                 case FILE_OPEN:
@@ -126,7 +123,7 @@ public class PickSafFile implements IFileDialog {
     }
 
     public static Builder create(Activity context) {
-        return new PickSafFile(context).new Builder();
+        return new SafDialog(context).new Builder();
     }
 
     public class Builder {
@@ -142,7 +139,7 @@ public class PickSafFile implements IFileDialog {
          *                   FOLDER_CHOOSE - открываем диалог выбора папки
          */
         public Builder setSelectType(int selectType) {
-            PickSafFile.this.setSelectType(selectType);
+            SafDialog.this.setSelectType(selectType);
             return this;
         }
 
@@ -152,7 +149,7 @@ public class PickSafFile implements IFileDialog {
          * @param listener
          */
         public Builder setFileDialogListener(FileDialogListener listener) {
-            PickSafFile.this.setFileDialogListener(listener);
+            SafDialog.this.setFileDialogListener(listener);
             return this;
         }
 
@@ -163,17 +160,17 @@ public class PickSafFile implements IFileDialog {
          * @param safLauncher
          */
         public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
-            PickSafFile.this.setSafLauncher(safLauncher);
+            SafDialog.this.setSafLauncher(safLauncher);
             return this;
         }
 
         public Builder setMimeType(String mimeType) {
-            PickSafFile.this.setMimeType(mimeType);
+            SafDialog.this.setMimeType(mimeType);
             return this;
         }
 
         public IFileDialog build() {
-            return PickSafFile.this;
+            return SafDialog.this;
         }
     }
 }

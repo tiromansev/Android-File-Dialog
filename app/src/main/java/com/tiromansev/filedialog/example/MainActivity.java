@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tiromansev.filedialog.FileDialog;
 import com.tiromansev.filedialog.IFileDialog;
-import com.tiromansev.filedialog.PickSafFile;
+import com.tiromansev.filedialog.SafDialog;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
         btnOpenDialog.setOnClickListener(v -> {
-            fileDialog = PickSafFile.create(MainActivity.this)
+            fileDialog = SafDialog.create(MainActivity.this)
                     .setSelectType(FileDialog.FOLDER_CHOOSE)
                     .setMimeType("application/vnd.ms-excel")
                     .setSafLauncher(fileDialogLauncher)
