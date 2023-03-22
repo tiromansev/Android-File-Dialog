@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 
 import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
@@ -17,6 +18,7 @@ public class PickSafFile implements IFileDialog {
     private FileDialogListener fileDialogListener = null;
     private String mimeType;
     private ActivityResultLauncher<Intent> safLauncher;
+    private int selectType = FILE_OPEN;
 
     public PickSafFile(Activity context) {
         this.context = new WeakReference<>(context);
@@ -48,6 +50,7 @@ public class PickSafFile implements IFileDialog {
 
     @Override
     public void setSelectType(int selectType) {
+        this.selectType = selectType;
     }
 
     @Override
@@ -69,14 +72,35 @@ public class PickSafFile implements IFileDialog {
 
     private void openSaf() {
         if (safLauncher != null) {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType(mimeType);
-            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-            intent.putExtra("android.content.extra.FANCY", true);
-            intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
-            GuiUtils.tryToStartLauncher(getContext(), safLauncher, intent);
+            switch (selectType) {
+                case FILE_OPEN:
+                    GuiUtils.tryToStartLauncher(getContext(), safLauncher, openFileIntent());
+                    break;
+                case FOLDER_CHOOSE:
+                    GuiUtils.tryToStartLauncher(getContext(), safLauncher, chooseFolderIntent());
+                    break;
+            }
         }
+    }
+
+    @NonNull
+    private Intent chooseFolderIntent() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+        intent.putExtra("android.content.extra.FANCY", true);
+        intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
+        return intent;
+    }
+
+    @NonNull
+    private Intent openFileIntent() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+        intent.putExtra("android.content.extra.FANCY", true);
+        intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
+        return intent;
     }
 
     private void handleSafAction(Uri uri) {
@@ -108,6 +132,18 @@ public class PickSafFile implements IFileDialog {
     public class Builder {
 
         public Builder() {
+        }
+
+        /**
+         * устанавливает тип диалога
+         *
+         * @param selectType может иметь два значения
+         *                   FILE_OPEN - открываем диалог выбора файла
+         *                   FOLDER_CHOOSE - открываем диалог выбора папки
+         */
+        public Builder setSelectType(int selectType) {
+            PickSafFile.this.setSelectType(selectType);
+            return this;
         }
 
         /**

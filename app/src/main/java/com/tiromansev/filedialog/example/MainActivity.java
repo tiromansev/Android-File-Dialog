@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button btnOpenDialog = findViewById(R.id.btnOpenDialog);
-        btnOpenDialog.setOnClickListener(v -> {
+        /*btnOpenDialog.setOnClickListener(v -> {
             fileDialog = FileDialog.create(MainActivity.this)
                     .setSelectType(FileDialog.FILE_SAVE)
                     .setFileName("new_file_name")
@@ -44,17 +44,18 @@ public class MainActivity extends AppCompatActivity {
                             GuiUtils.showMessage(MainActivity.this, uri.toString()))
                     .build();
             fileDialog.show();
-        });
+        });*/
 
-        /*btnOpenDialog.setOnClickListener(v -> {
+        btnOpenDialog.setOnClickListener(v -> {
             fileDialog = PickSafFile.create(MainActivity.this)
+                    .setSelectType(FileDialog.FOLDER_CHOOSE)
                     .setMimeType("application/vnd.ms-excel")
                     .setSafLauncher(fileDialogLauncher)
                     .setFileDialogListener((uri) ->
                             GuiUtils.showMessage(MainActivity.this, uri.toString()))
                     .build();
             fileDialog.show();
-        });*/
+        });
     }
 
     @Override
