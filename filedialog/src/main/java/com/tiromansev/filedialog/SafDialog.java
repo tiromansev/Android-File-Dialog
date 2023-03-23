@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 
 import com.tiromansev.filedialog.utils.DialogUtils;
+import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
 import java.lang.ref.WeakReference;
@@ -16,6 +17,7 @@ public class SafDialog implements IFileDialog {
 
     private final WeakReference<Activity> context;
     private FileDialogListener fileDialogListener = null;
+    private FileNameDialogListener fileNameDialogListener = null;
     private ActivityResultLauncher<Intent> safLauncher;
     private int selectType = FILE_OPEN;
     private String mimeType;
@@ -63,6 +65,10 @@ public class SafDialog implements IFileDialog {
     @Override
     public void setFileDialogListener(FileDialogListener fileDialogListener) {
         this.fileDialogListener = fileDialogListener;
+    }
+
+    public void setFileNameDialogListener(FileNameDialogListener fileNameDialogListener) {
+        this.fileNameDialogListener = fileNameDialogListener;
     }
 
     public void show() {
@@ -132,8 +138,15 @@ public class SafDialog implements IFileDialog {
             return;
         }
 
-        if (fileDialogListener != null) {
-            fileDialogListener.onFileResult(uri);
+        if (selectType == IFileDialog.FILE_SAVE) {
+            if (fileNameDialogListener != null) {
+                String fileName = FileUtils.getFileName(getContext(), uri);
+                fileNameDialogListener.onFileResult(uri, fileName);
+            }
+        } else {
+            if (fileDialogListener != null) {
+                fileDialogListener.onFileResult(uri);
+            }
         }
     }
 
@@ -186,6 +199,16 @@ public class SafDialog implements IFileDialog {
          */
         public Builder setFileDialogListener(FileDialogListener listener) {
             SafDialog.this.setFileDialogListener(listener);
+            return this;
+        }
+
+        /**
+         * устанавливает слушатель для выбора файла, который возвращает строковое значение абсолютного пути к выбранному файлу
+         *
+         * @param listener
+         */
+        public SafDialog.Builder setFileNameDialogListener(FileNameDialogListener listener) {
+            SafDialog.this.setFileNameDialogListener(listener);
             return this;
         }
 
