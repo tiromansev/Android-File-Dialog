@@ -151,7 +151,7 @@ public class SafDialog implements IFileDialog {
     }
 
     public void handleSafLauncherResult(Intent data) {
-        if (fileDialogListener == null) {
+        if (fileDialogListener == null && fileNameDialogListener == null) {
             return;
         }
 
