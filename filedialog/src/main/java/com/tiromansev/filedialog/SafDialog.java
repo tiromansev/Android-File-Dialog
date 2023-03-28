@@ -89,14 +89,6 @@ public class SafDialog implements IFileDialog {
     }
 
     public void show() {
-//        if (AppPrefs.showUseSafRationaleDialog().getValue()) {
-//            AppPrefs.showUseSafRationaleDialog().setValue(false);
-//            DialogUtils.showSimpleDialog(getContext(),
-//                    getContext().getString(R.string.message_saf_use_rationale),
-//                    this::launchSaf);
-//            return;
-//        }
-
         launchSaf();
     }
 
