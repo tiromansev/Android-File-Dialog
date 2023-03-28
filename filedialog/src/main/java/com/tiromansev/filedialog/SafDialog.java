@@ -72,13 +72,13 @@ public class SafDialog implements IFileDialog {
     }
 
     public void show() {
-        if (AppPrefs.showUseSafRationaleDialog().getValue()) {
-            AppPrefs.showUseSafRationaleDialog().setValue(false);
-            DialogUtils.showSimpleDialog(getContext(),
-                    getContext().getString(R.string.message_saf_use_rationale),
-                    this::launchSaf);
-            return;
-        }
+//        if (AppPrefs.showUseSafRationaleDialog().getValue()) {
+//            AppPrefs.showUseSafRationaleDialog().setValue(false);
+//            DialogUtils.showSimpleDialog(getContext(),
+//                    getContext().getString(R.string.message_saf_use_rationale),
+//                    this::launchSaf);
+//            return;
+//        }
 
         launchSaf();
     }
@@ -95,7 +95,6 @@ public class SafDialog implements IFileDialog {
             case FOLDER_CHOOSE:
                 GuiUtils.tryToStartLauncher(getContext(), safLauncher, chooseFolderIntent());
                 break;
-
             case FILE_SAVE:
                 GuiUtils.tryToStartLauncher(getContext(), safLauncher, createFileIntent());
                 break;
