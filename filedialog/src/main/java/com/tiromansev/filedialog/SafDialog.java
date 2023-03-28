@@ -3,17 +3,34 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 
-import com.tiromansev.filedialog.utils.DialogUtils;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
 import java.lang.ref.WeakReference;
 
 public class SafDialog implements IFileDialog {
+
+    public static final String TEXT_MIME = "text/plain";
+    public static final String BINARY_MIME = "application/octet-stream";
+    public static final String PDF_MIME = "application/pdf";
+    public static final String EXCEL_MIME = "application/vnd.ms-excel";
+    public static final String CSV_MIME = "text/plain";
+    public static final String SQLITE_MIME = "application/x-sqlite3";
+    public static final String ZIP_MIME = "application/zip";
+
+    public static final String EXCEL_FILE_EXT = ".xls";
+    public static final String CSV_FILE_EXT = ".csv";
+    public static final String EXCELX_FILE_EXT = ".xlsx";
+    public static final String BACKUP_FILE_EXT = ".bp";
+    public static final String BACKUP_FILE_EXT2 = ".bp2";
+    public static final String PRINT_FORM_FILE_EXT = ".pf";
+    public static final String ZIP_FILE_EXT = ".zip";
+    public static final String PDF_FILE_EXT = ".pdf";
 
     private final WeakReference<Activity> context;
     private FileDialogListener fileDialogListener = null;
@@ -137,9 +154,14 @@ public class SafDialog implements IFileDialog {
             return;
         }
 
+        String fileName = FileUtils.getFileName(getContext(), uri);
+        if (!isValidMimeType(mimeType, getFileExt(fileName))) {
+            GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
+            return;
+        }
+
         if (selectType == IFileDialog.FILE_SAVE) {
             if (fileNameDialogListener != null) {
-                String fileName = FileUtils.getFileName(getContext(), uri);
                 fileNameDialogListener.onFileResult(uri, fileName);
             }
         } else {
@@ -158,6 +180,56 @@ public class SafDialog implements IFileDialog {
             Uri uri = data.getData();
             handleSafAction(uri);
         }
+    }
+
+    private String getFileExt(String fileName) {
+        String fileExt;
+
+        int i = fileName.lastIndexOf('.');
+        fileExt = fileName.substring(i + 1);
+
+        return fileExt;
+    }
+
+    private boolean isValidMimeType(String mimeType, String fileExt) {
+        if (TextUtils.isEmpty(mimeType)) {
+            return false;
+        }
+        switch (mimeType) {
+            case CSV_MIME:
+                if (fileExt.equals(CSV_FILE_EXT)) {
+                    return true;
+                }
+                break;
+            case EXCEL_MIME:
+                if (fileExt.equals(EXCEL_FILE_EXT) ||
+                        fileExt.equals(EXCELX_FILE_EXT)) {
+                    return true;
+                }
+                break;
+            case ZIP_MIME:
+                if (fileExt.equals(ZIP_FILE_EXT)) {
+                    return true;
+                }
+                break;
+            case SQLITE_MIME:
+                if (fileExt.equals(BACKUP_FILE_EXT)) {
+                    return true;
+                }
+                break;
+            case BINARY_MIME:
+                if (fileExt.equals(BACKUP_FILE_EXT) || fileExt.equals(BACKUP_FILE_EXT2)) {
+                    return true;
+                }
+                break;
+            case PDF_MIME:
+                if (fileExt.equals(PDF_FILE_EXT)) {
+                    return true;
+                }
+                break;
+        }
+
+        return false;
     }
 
     public static Builder create(Activity context) {

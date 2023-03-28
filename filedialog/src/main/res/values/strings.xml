@@ -9,4 +9,5 @@
     <string name="message_file_create_failed">Обнаружена ошибка создания файла!</string>
     <string name="caption_file_name">Имя файла</string>
     <string name="message_intent_not_have_activity">There is no application capable to perform this action</string>
+    <string name="message_wrong_file_ext">Wrong file type!</string>
 </resources>
