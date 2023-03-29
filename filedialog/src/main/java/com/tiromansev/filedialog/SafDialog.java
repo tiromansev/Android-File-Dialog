@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
@@ -39,6 +40,7 @@ public class SafDialog implements IFileDialog {
     private int selectType = FILE_OPEN;
     private String mimeType;
     private String fileName;
+    private String fileExt;
 
     public SafDialog(Activity context) {
         this.context = new WeakReference<>(context);
@@ -46,6 +48,10 @@ public class SafDialog implements IFileDialog {
 
     public void setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
         this.safLauncher = safLauncher;
+    }
+
+    public void setFileExt(String fileExt) {
+        this.fileExt = fileExt;
     }
 
     @Override
@@ -145,22 +151,54 @@ public class SafDialog implements IFileDialog {
             GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
             return;
         }
+        SafFile safFile = new SafFile(getContext(), uri);
 
-        String fileName = FileUtils.getFileName(getContext(), uri);
+        if (selectType == FILE_OPEN)
+            openFile(safFile);
+        else
+            saveFile(safFile);
+    }
 
-        if (fileName == null) {
-            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
-            return;
+    private void saveFile(SafFile safFile) {
+        if (selectType == FOLDER_CHOOSE) {
+            if (fileDialogListener != null)
+                fileDialogListener.onFileResult(safFile.getUri());
+            if (fileNameDialogListener != null)
+                fileNameDialogListener.onFileResult(safFile.getUri(), null);
+        } else {
+            String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
+            String fileName = FileUtils.getFileName(getContext(), safFile.getUri());
+            if (TextUtils.isEmpty(fileName)) {
+                GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
+                return;
+            }
+            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName + resultFileExt);
+            if (result == null) {
+                GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
+                return;
+            }
+            if (fileDialogListener != null)
+                fileDialogListener.onFileResult(result.getUri());
+            if (fileNameDialogListener != null)
+                fileNameDialogListener.onFileResult(result.getUri(), fileName + resultFileExt);
         }
-        if (selectType == IFileDialog.FILE_OPEN && !isValidMimeType(mimeType, getFileExt(fileName))) {
-            GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
-            return;
-        }
+    }
+
+    private void openFile(SafFile safFile) {
         if (fileDialogListener != null) {
-            fileDialogListener.onFileResult(uri);
+            fileDialogListener.onFileResult(safFile.getUri());
         }
         if (fileNameDialogListener != null) {
-            fileNameDialogListener.onFileResult(uri, fileName);
+            String fileName = FileUtils.getFileName(getContext(), safFile.getUri());
+            if (TextUtils.isEmpty(fileName)) {
+                GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
+                return;
+            }
+            if (!isValidMimeType(mimeType, getFileExt(fileName))) {
+                GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
+                return;
+            }
+            fileNameDialogListener.onFileResult(safFile.getUri(), fileName);
         }
     }
 
@@ -284,6 +322,11 @@ public class SafDialog implements IFileDialog {
          */
         public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
             SafDialog.this.setSafLauncher(safLauncher);
+            return this;
+        }
+
+        public Builder setFileExt(String fileExt) {
+            SafDialog.this.setFileExt(fileExt);
             return this;
         }
 

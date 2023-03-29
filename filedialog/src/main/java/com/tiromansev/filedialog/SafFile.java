@@ -17,6 +17,10 @@ public class SafFile {
         this.uri = uri;
     }
 
+    public Uri getUri() {
+        return uri;
+    }
+
     public DocumentFile getFile() {
         Context context = this.context.get();
         if (uri != null && context != null) {
