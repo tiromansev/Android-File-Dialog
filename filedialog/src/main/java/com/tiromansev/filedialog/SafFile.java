@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference;
 
 public class SafFile {
 
-    private final Uri uri;
+    private Uri uri;
     private final WeakReference<Context> context;
 
     public SafFile(Context context, Uri uri) {
@@ -19,6 +19,10 @@ public class SafFile {
 
     public Uri getUri() {
         return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public DocumentFile getFile() {

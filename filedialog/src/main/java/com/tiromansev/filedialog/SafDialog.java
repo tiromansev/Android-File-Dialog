@@ -176,7 +176,8 @@ public class SafDialog implements IFileDialog {
             }
             DocumentFile result = DocumentFile.fromSingleUri(getContext(), safFile.getUri());
             try {
-                DocumentsContract.renameDocument(getContext().getContentResolver(), result.getUri(), fileName + resultFileExt);
+                safFile.setUri(DocumentsContract.renameDocument(getContext().getContentResolver(),
+                        result.getUri(), fileName + resultFileExt));
             } catch (FileNotFoundException e) {
                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                 return;
