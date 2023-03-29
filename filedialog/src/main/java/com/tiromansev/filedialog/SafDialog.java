@@ -147,10 +147,6 @@ public class SafDialog implements IFileDialog {
         }
 
         String fileName = FileUtils.getFileName(getContext(), uri);
-        if (!isValidMimeType(mimeType, getFileExt(fileName))) {
-            GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
-            return;
-        }
 
         if (selectType == IFileDialog.FILE_SAVE) {
             if (fileNameDialogListener != null) {
@@ -158,6 +154,11 @@ public class SafDialog implements IFileDialog {
             }
         } else {
             if (fileDialogListener != null) {
+                if (selectType == IFileDialog.FILE_OPEN && !isValidMimeType(mimeType, getFileExt(fileName))) {
+                    GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
+                    return;
+                }
+
                 fileDialogListener.onFileResult(uri);
             }
         }
