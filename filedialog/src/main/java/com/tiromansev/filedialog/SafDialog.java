@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-import androidx.documentfile.provider.DocumentFile;
 
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
@@ -174,18 +173,17 @@ public class SafDialog implements IFileDialog {
                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                 return;
             }
-            DocumentFile result = DocumentFile.fromSingleUri(getContext(), safFile.getUri());
             try {
                 safFile.setUri(DocumentsContract.renameDocument(getContext().getContentResolver(),
-                        result.getUri(), fileName + resultFileExt));
+                        safFile.getUri(), fileName + resultFileExt));
             } catch (FileNotFoundException e) {
                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                 return;
             }
             if (fileDialogListener != null)
-                fileDialogListener.onFileResult(result.getUri());
+                fileDialogListener.onFileResult(safFile.getUri());
             if (fileNameDialogListener != null)
-                fileNameDialogListener.onFileResult(result.getUri(), fileName + resultFileExt);
+                fileNameDialogListener.onFileResult(safFile.getUri(), fileName + resultFileExt);
         }
     }
 
