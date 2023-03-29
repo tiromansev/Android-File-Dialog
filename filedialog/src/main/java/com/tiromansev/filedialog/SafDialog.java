@@ -151,13 +151,31 @@ public class SafDialog implements IFileDialog {
             GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
             return;
         }
-        SafFile safFile = new SafFile(getContext(), uri);
 
-        if (selectType == FILE_OPEN)
-            openFile(safFile);
-        else
-            saveFile(safFile);
+        if (selectType == IFileDialog.FILE_SAVE) {
+            if (fileNameDialogListener != null) {
+                String fileName = FileUtils.getFileName(getContext(), uri);
+                fileNameDialogListener.onFileResult(uri, fileName);
+            }
+        } else {
+            if (fileDialogListener != null) {
+                fileDialogListener.onFileResult(uri);
+            }
+        }
     }
+
+//    private void handleSafAction(Uri uri) {
+//        if (uri == null) {
+//            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
+//            return;
+//        }
+//        SafFile safFile = new SafFile(getContext(), uri);
+//
+//        if (selectType == FILE_OPEN)
+//            openFile(safFile);
+//        else
+//            saveFile(safFile);
+//    }
 
     private void saveFile(SafFile safFile) {
         if (selectType == FOLDER_CHOOSE) {

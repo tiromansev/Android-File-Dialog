@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tiromansev.filedialog.FileDialog;
@@ -33,38 +32,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button btnOpenDialog = findViewById(R.id.btnOpenDialog);
-        /*btnOpenDialog.setOnClickListener(v -> {
-            fileDialog = FileDialog.create(MainActivity.this)
-                    .setSelectType(FileDialog.FILE_SAVE)
-                    .setFileName("new_file_name")
-                    .setFileExt(".txt")
-                    .setAddModifiedDate(true)
-                    .setSafLauncher(fileDialogLauncher)
-                    .setFileDialogListener((uri) ->
-                            GuiUtils.showMessage(MainActivity.this, uri.toString()))
-                    .build();
-            fileDialog.show();
-        });*/
 
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = SafDialog.create(MainActivity.this)
                     .setSelectType(FileDialog.FILE_SAVE)
-                    .setMimeType("text/plain")
+                    .setMimeType(SafDialog.BINARY_MIME)
                     .setFileName("1234567")
-                    //.setMimeType("application/vnd.ms-excel")
                     .setSafLauncher(fileDialogLauncher)
-                    .setFileDialogListener((uri) ->
+                    .setFileNameDialogListener((uri, s) ->
                             GuiUtils.showMessage(MainActivity.this, uri.toString()))
                     .build();
             fileDialog.show();
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-//        if (fileDialog != null) {
-//            fileDialog.handleRequestResult(requestCode, resultCode, data);
-//        }
     }
 }
