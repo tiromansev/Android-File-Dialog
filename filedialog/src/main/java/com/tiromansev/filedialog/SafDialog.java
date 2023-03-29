@@ -3,6 +3,7 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.DocumentsContract;
 import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -12,6 +13,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
+import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 
 public class SafDialog implements IFileDialog {
@@ -151,31 +153,13 @@ public class SafDialog implements IFileDialog {
             GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
             return;
         }
+        SafFile safFile = new SafFile(getContext(), uri);
 
-        if (selectType == IFileDialog.FILE_SAVE) {
-            if (fileNameDialogListener != null) {
-                String fileName = FileUtils.getFileName(getContext(), uri);
-                fileNameDialogListener.onFileResult(uri, fileName);
-            }
-        } else {
-            if (fileDialogListener != null) {
-                fileDialogListener.onFileResult(uri);
-            }
-        }
+        if (selectType == FILE_OPEN)
+            openFile(safFile);
+        else
+            saveFile(safFile);
     }
-
-//    private void handleSafAction(Uri uri) {
-//        if (uri == null) {
-//            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
-//            return;
-//        }
-//        SafFile safFile = new SafFile(getContext(), uri);
-//
-//        if (selectType == FILE_OPEN)
-//            openFile(safFile);
-//        else
-//            saveFile(safFile);
-//    }
 
     private void saveFile(SafFile safFile) {
         if (selectType == FOLDER_CHOOSE) {
@@ -190,8 +174,10 @@ public class SafDialog implements IFileDialog {
                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                 return;
             }
-            DocumentFile result = FileUtils.getDocumentFile(safFile.getFile(), fileName + resultFileExt);
-            if (result == null) {
+            DocumentFile result = DocumentFile.fromSingleUri(getContext(), safFile.getUri());
+            try {
+                DocumentsContract.renameDocument(getContext().getContentResolver(), result.getUri(), fileName + resultFileExt);
+            } catch (FileNotFoundException e) {
                 GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
                 return;
             }

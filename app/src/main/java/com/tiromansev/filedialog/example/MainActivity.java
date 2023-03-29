@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
             fileDialog = SafDialog.create(MainActivity.this)
                     .setSelectType(FileDialog.FILE_SAVE)
                     .setMimeType(SafDialog.BINARY_MIME)
+                    .setFileExt(SafDialog.BACKUP_FILE_EXT2)
                     .setFileName("1234567")
                     .setSafLauncher(fileDialogLauncher)
                     .setFileNameDialogListener((uri, s) ->
