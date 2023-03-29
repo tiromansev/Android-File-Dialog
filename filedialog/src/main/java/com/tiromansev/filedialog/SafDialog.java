@@ -148,19 +148,19 @@ public class SafDialog implements IFileDialog {
 
         String fileName = FileUtils.getFileName(getContext(), uri);
 
-        if (selectType == IFileDialog.FILE_SAVE) {
-            if (fileNameDialogListener != null) {
-                fileNameDialogListener.onFileResult(uri, fileName);
-            }
-        } else {
-            if (fileDialogListener != null) {
-                if (selectType == IFileDialog.FILE_OPEN && !isValidMimeType(mimeType, getFileExt(fileName))) {
-                    GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
-                    return;
-                }
-
-                fileDialogListener.onFileResult(uri);
-            }
+        if (fileName == null) {
+            GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
+            return;
+        }
+        if (selectType == IFileDialog.FILE_OPEN && !isValidMimeType(mimeType, getFileExt(fileName))) {
+            GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
+            return;
+        }
+        if (fileDialogListener != null) {
+            fileDialogListener.onFileResult(uri);
+        }
+        if (fileNameDialogListener != null) {
+            fileNameDialogListener.onFileResult(uri, fileName);
         }
     }
 
