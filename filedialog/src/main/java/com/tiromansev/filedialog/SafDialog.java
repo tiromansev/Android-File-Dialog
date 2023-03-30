@@ -212,6 +212,8 @@ public class SafDialog implements IFileDialog {
 
         if (data != null) {
             Uri uri = data.getData();
+            getContext().getContentResolver().takePersistableUriPermission(uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             handleSafAction(uri);
         }
     }
