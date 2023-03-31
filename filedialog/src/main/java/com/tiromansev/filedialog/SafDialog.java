@@ -239,7 +239,9 @@ public class SafDialog implements IFileDialog {
                 }
                 break;
             case BINARY_MIME:
-                if (fileExt.equals(BACKUP_FILE_EXT) || fileExt.equals(BACKUP_FILE_EXT2)) {
+                if (fileExt.equals(BACKUP_FILE_EXT) ||
+                        fileExt.equals(BACKUP_FILE_EXT2) ||
+                        fileExt.equals(PRINT_FORM_FILE_EXT)) {
                     return true;
                 }
                 break;
