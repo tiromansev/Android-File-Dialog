@@ -3,7 +3,6 @@ package com.tiromansev.filedialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.DocumentsContract;
 import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -12,7 +11,6 @@ import androidx.annotation.NonNull;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
-import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 
 public class SafDialog implements IFileDialog {
@@ -41,7 +39,6 @@ public class SafDialog implements IFileDialog {
     private int selectType = FILE_OPEN;
     private String mimeType;
     private String fileName;
-    private String fileExt;
 
     public SafDialog(Activity context) {
         this.context = new WeakReference<>(context);
@@ -49,10 +46,6 @@ public class SafDialog implements IFileDialog {
 
     public void setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
         this.safLauncher = safLauncher;
-    }
-
-    public void setFileExt(String fileExt) {
-        this.fileExt = fileExt;
     }
 
     @Override
@@ -167,25 +160,15 @@ public class SafDialog implements IFileDialog {
             if (fileNameDialogListener != null)
                 fileNameDialogListener.onFileResult(safFile.getUri(), null);
         } else {
-            String resultFileExt = TextUtils.isEmpty(fileExt) ? "" : fileExt;
             String fileName = FileUtils.getFileName(getContext(), safFile.getUri());
             if (TextUtils.isEmpty(fileName)) {
                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                 return;
             }
-            try {
-                safFile.setUri(DocumentsContract.renameDocument(getContext().getContentResolver(),
-                        safFile.getUri(), fileName + resultFileExt));
-                getContext().getContentResolver().takePersistableUriPermission(safFile.getUri(),
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            } catch (FileNotFoundException e) {
-                GuiUtils.showMessage(getContext(), R.string.message_file_create_failed);
-                return;
-            }
             if (fileDialogListener != null)
                 fileDialogListener.onFileResult(safFile.getUri());
             if (fileNameDialogListener != null)
-                fileNameDialogListener.onFileResult(safFile.getUri(), fileName + resultFileExt);
+                fileNameDialogListener.onFileResult(safFile.getUri(), fileName);
         }
     }
 
@@ -329,11 +312,6 @@ public class SafDialog implements IFileDialog {
          */
         public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
             SafDialog.this.setSafLauncher(safLauncher);
-            return this;
-        }
-
-        public Builder setFileExt(String fileExt) {
-            SafDialog.this.setFileExt(fileExt);
             return this;
         }
 
