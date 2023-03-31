@@ -127,9 +127,11 @@ public class SafDialog implements IFileDialog {
     private Intent openFileIntent() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(mimeType);
+        intent.setType("*/*");
         if (mimeTypes.length > 0) {
-            intent.setType(getMimeTypes());
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, getMimeTypes());
+        } else {
+            intent.setType(mimeType);
         }
         return applyCommonSettings(intent);
     }
@@ -140,7 +142,7 @@ public class SafDialog implements IFileDialog {
 
         for (String mimeType : mimeTypes) {
             sb.append(splitter).append(mimeType);
-            splitter = "|";
+            splitter = ",";
         }
         return sb.toString();
     }
@@ -203,7 +205,20 @@ public class SafDialog implements IFileDialog {
                 GuiUtils.showMessage(getContext(), R.string.message_file_name_is_empty);
                 return;
             }
-            if (!isValidMimeType(mimeType, getFileExt(fileName))) {
+            String fileExt = getFileExt(fileName);
+            if (mimeTypes.length > 0) {
+                boolean isValid = false;
+                for (String mimeType : mimeTypes) {
+                    if (isValidMimeType(mimeType, fileExt)) {
+                        isValid = true;
+                        break;
+                    }
+                }
+                if (!isValid) {
+                    GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
+                    return;
+                }
+            } else if (!isValidMimeType(mimeType, fileExt)) {
                 GuiUtils.showMessage(getContext(), R.string.message_wrong_file_ext);
                 return;
             }
@@ -218,8 +233,6 @@ public class SafDialog implements IFileDialog {
 
         if (data != null) {
             Uri uri = data.getData();
-            getContext().getContentResolver().takePersistableUriPermission(uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             handleSafAction(uri);
         }
     }
@@ -230,7 +243,7 @@ public class SafDialog implements IFileDialog {
         int i = fileName.lastIndexOf('.');
         fileExt = fileName.substring(i + 1);
 
-        return fileExt;
+        return "." + fileExt;
     }
 
     private boolean isValidMimeType(String mimeType, String fileExt) {

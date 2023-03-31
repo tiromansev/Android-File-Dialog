@@ -2,6 +2,7 @@ package com.tiromansev.filedialog.example;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,12 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = SafDialog.create(MainActivity.this)
-                    .setSelectType(FileDialog.FILE_SAVE)
-                    .setMimeType(SafDialog.BINARY_MIME)
+                    .setSelectType(FileDialog.FILE_OPEN)
+                    .setMimeTypes(SafDialog.EXCEL_FILE_MIMES)
                     .setFileName("1234567")
                     .setSafLauncher(fileDialogLauncher)
-                    .setFileNameDialogListener((uri, s) ->
-                            GuiUtils.showMessage(MainActivity.this, uri.toString()))
+                    .setFileNameDialogListener((uri, s) -> {
+                        GuiUtils.showMessage(MainActivity.this, uri.toString());
+                        Log.d("selected_file", "uri: " + uri.toString());
+                    })
                     .build();
             fileDialog.show();
         });
