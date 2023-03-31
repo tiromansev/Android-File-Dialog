@@ -22,6 +22,8 @@ public class SafDialog implements IFileDialog {
     public static final String CSV_MIME = "text/plain";
     public static final String SQLITE_MIME = "application/x-sqlite3";
     public static final String ZIP_MIME = "application/zip";
+    public static final String EXCELX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public static final String[] EXCEL_FILE_MIMES = new String[]{EXCEL_MIME, EXCELX_MIME};
 
     public static final String EXCEL_FILE_EXT = ".xls";
     public static final String CSV_FILE_EXT = ".csv";
@@ -38,6 +40,7 @@ public class SafDialog implements IFileDialog {
     private ActivityResultLauncher<Intent> safLauncher;
     private int selectType = FILE_OPEN;
     private String mimeType;
+    private String[] mimeTypes = new String[]{};
     private String fileName;
 
     public SafDialog(Activity context) {
@@ -50,6 +53,10 @@ public class SafDialog implements IFileDialog {
 
     @Override
     public void setAddModifiedDate(boolean add) {
+    }
+
+    public void setMimeTypes(String[] mimeTypes) {
+        this.mimeTypes = mimeTypes;
     }
 
     public Activity getContext() {
@@ -124,11 +131,25 @@ public class SafDialog implements IFileDialog {
         return applyCommonSettings(intent);
     }
 
+    private String getMimeTypes() {
+        StringBuilder sb = new StringBuilder();
+        String splitter = "";
+
+        for (String mimeType : mimeTypes) {
+            sb.append(splitter).append(mimeType);
+            splitter = "|";
+        }
+        return sb.toString();
+    }
+
     @NonNull
     private Intent createFileIntent() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
+        if (mimeTypes.length > 0) {
+            intent.setType(getMimeTypes());
+        }
         intent.putExtra(Intent.EXTRA_TITLE, fileName);
         return applyCommonSettings(intent);
     }
@@ -320,6 +341,10 @@ public class SafDialog implements IFileDialog {
         public Builder setMimeType(String mimeType) {
             SafDialog.this.setMimeType(mimeType);
             return this;
+        }
+
+        public void setMimeTypes(String[] mimeTypes) {
+            SafDialog.this.mimeTypes = mimeTypes;
         }
 
         public IFileDialog build() {
