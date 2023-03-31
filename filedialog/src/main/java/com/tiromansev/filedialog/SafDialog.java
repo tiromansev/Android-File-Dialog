@@ -128,6 +128,9 @@ public class SafDialog implements IFileDialog {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
+        if (mimeTypes.length > 0) {
+            intent.setType(getMimeTypes());
+        }
         return applyCommonSettings(intent);
     }
 
@@ -147,9 +150,6 @@ public class SafDialog implements IFileDialog {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
-        if (mimeTypes.length > 0) {
-            intent.setType(getMimeTypes());
-        }
         intent.putExtra(Intent.EXTRA_TITLE, fileName);
         return applyCommonSettings(intent);
     }
