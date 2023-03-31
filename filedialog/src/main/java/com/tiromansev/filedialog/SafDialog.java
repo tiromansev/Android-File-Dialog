@@ -343,8 +343,9 @@ public class SafDialog implements IFileDialog {
             return this;
         }
 
-        public void setMimeTypes(String[] mimeTypes) {
+        public Builder setMimeTypes(String[] mimeTypes) {
             SafDialog.this.mimeTypes = mimeTypes;
+            return this;
         }
 
         public IFileDialog build() {
