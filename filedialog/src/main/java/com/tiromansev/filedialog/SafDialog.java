@@ -77,7 +77,17 @@ public class SafDialog implements IFileDialog {
     }
 
     public void setMimeTypes(String[] mimeTypes) {
-        this.mimeTypes = mimeTypes;
+        this.mimeTypes = new String[mimeTypes.length];
+
+        for (int i = 0; i < mimeTypes.length; i++) {
+            String mimeType = mimeTypes[i];
+
+            if (mimeType.equals("text/plain") || mimeType.equals("text/csv")) {
+                mimeType = "text/comma-separated-values";
+            }
+
+            this.mimeTypes[i] = mimeType;
+        }
     }
 
     public Activity getContext() {
