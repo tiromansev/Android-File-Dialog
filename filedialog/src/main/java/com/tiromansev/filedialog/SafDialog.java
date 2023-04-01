@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.anggrayudi.storage.SimpleStorageHelper;
 import com.tiromansev.filedialog.utils.FileUtils;
 import com.tiromansev.filedialog.utils.GuiUtils;
 
@@ -37,18 +37,39 @@ public class SafDialog implements IFileDialog {
     private final WeakReference<Activity> context;
     private FileDialogListener fileDialogListener = null;
     private FileNameDialogListener fileNameDialogListener = null;
-    private ActivityResultLauncher<Intent> safLauncher;
     private int selectType = FILE_OPEN;
     private String mimeType;
     private String[] mimeTypes = new String[]{};
     private String fileName;
+    private final SimpleStorageHelper storageHelper;
 
-    public SafDialog(Activity context) {
+    public SafDialog(AppCompatActivity context, SimpleStorageHelper storageHelper) {
         this.context = new WeakReference<>(context);
-    }
+        this.storageHelper = storageHelper;
 
-    public void setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
-        this.safLauncher = safLauncher;
+        this.storageHelper.setOnFileCreated((requestCode, file) -> {
+            if (fileDialogListener == null && fileNameDialogListener == null) {
+                return null;
+            }
+            handleSafAction(file.getUri());
+            return null;
+        });
+
+        this.storageHelper.setOnFileSelected((requestCode, files) -> {
+            if (fileDialogListener == null && fileNameDialogListener == null) {
+                return null;
+            }
+            handleSafAction(files.get(0).getUri());
+            return null;
+        });
+
+        this.storageHelper.setOnFolderSelected((requestCode, folder) -> {
+            if (fileDialogListener == null && fileNameDialogListener == null) {
+                return null;
+            }
+            handleSafAction(folder.getUri());
+            return null;
+        });
     }
 
     @Override
@@ -61,10 +82,6 @@ public class SafDialog implements IFileDialog {
 
     public Activity getContext() {
         return context.get();
-    }
-
-    public String getMimeType() {
-        return mimeType;
     }
 
     public void setMimeType(String mimeType) {
@@ -99,68 +116,27 @@ public class SafDialog implements IFileDialog {
         launchSaf();
     }
 
-    private void launchSaf() {
-        if (safLauncher == null) {
-            return;
-        }
+    @Override
+    public void handleSafLauncherResult(Intent data) {
 
+    }
+
+    private void launchSaf() {
         switch (selectType) {
             case FILE_OPEN:
-                GuiUtils.tryToStartLauncher(getContext(), safLauncher, openFileIntent());
+                if (mimeTypes.length > 0) {
+                    storageHelper.openFilePicker(0, false, mimeTypes);
+                } else {
+                    storageHelper.openFilePicker(0, false, mimeType);
+                }
                 break;
             case FOLDER_CHOOSE:
-                GuiUtils.tryToStartLauncher(getContext(), safLauncher, chooseFolderIntent());
+                storageHelper.openFolderPicker();
                 break;
             case FILE_SAVE:
-                GuiUtils.tryToStartLauncher(getContext(), safLauncher, createFileIntent());
+                storageHelper.createFile(mimeType, fileName);
                 break;
         }
-    }
-
-    @NonNull
-    private Intent chooseFolderIntent() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        return applyCommonSettings(intent);
-    }
-
-    @NonNull
-    private Intent openFileIntent() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        if (mimeTypes.length > 0) {
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, getMimeTypes());
-        } else {
-            intent.setType(mimeType);
-        }
-        return applyCommonSettings(intent);
-    }
-
-    private String getMimeTypes() {
-        StringBuilder sb = new StringBuilder();
-        String splitter = "";
-
-        for (String mimeType : mimeTypes) {
-            sb.append(splitter).append(mimeType);
-            splitter = ",";
-        }
-        return sb.toString();
-    }
-
-    @NonNull
-    private Intent createFileIntent() {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(mimeType);
-        intent.putExtra(Intent.EXTRA_TITLE, fileName);
-        return applyCommonSettings(intent);
-    }
-
-    private Intent applyCommonSettings(Intent intent) {
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-        intent.putExtra("android.content.extra.FANCY", true);
-        intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
-        return intent;
     }
 
     private void handleSafAction(Uri uri) {
@@ -226,17 +202,6 @@ public class SafDialog implements IFileDialog {
         }
     }
 
-    public void handleSafLauncherResult(Intent data) {
-        if (fileDialogListener == null && fileNameDialogListener == null) {
-            return;
-        }
-
-        if (data != null) {
-            Uri uri = data.getData();
-            handleSafAction(uri);
-        }
-    }
-
     private String getFileExt(String fileName) {
         String fileExt;
 
@@ -289,8 +254,8 @@ public class SafDialog implements IFileDialog {
         return false;
     }
 
-    public static Builder create(Activity context) {
-        return new SafDialog(context).new Builder();
+    public static Builder create(AppCompatActivity context, SimpleStorageHelper storageHelper) {
+        return new SafDialog(context, storageHelper).new Builder();
     }
 
     public class Builder {
@@ -337,17 +302,6 @@ public class SafDialog implements IFileDialog {
          */
         public SafDialog.Builder setFileNameDialogListener(FileNameDialogListener listener) {
             SafDialog.this.setFileNameDialogListener(listener);
-            return this;
-        }
-
-        /**
-         * устанавливает обработчик возврата в активити при вызове SAF диалога выбора папки для записи
-         * (требования гугла)
-         *
-         * @param safLauncher
-         */
-        public Builder setSafLauncher(ActivityResultLauncher<Intent> safLauncher) {
-            SafDialog.this.setSafLauncher(safLauncher);
             return this;
         }
 

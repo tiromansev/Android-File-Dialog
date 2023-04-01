@@ -1,14 +1,12 @@
 package com.tiromansev.filedialog.example;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.anggrayudi.storage.SimpleStorageHelper;
 import com.tiromansev.filedialog.FileDialog;
 import com.tiromansev.filedialog.IFileDialog;
 import com.tiromansev.filedialog.SafDialog;
@@ -17,15 +15,7 @@ import com.tiromansev.filedialog.utils.GuiUtils;
 public class MainActivity extends AppCompatActivity {
 
     private IFileDialog fileDialog;
-
-    protected final ActivityResultLauncher<Intent> fileDialogLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (fileDialog != null) {
-                    fileDialog.handleSafLauncherResult(result.getData());
-                }
-            }
-    );
+    private SimpleStorageHelper storageHelper = new SimpleStorageHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +25,10 @@ public class MainActivity extends AppCompatActivity {
         Button btnOpenDialog = findViewById(R.id.btnOpenDialog);
 
         btnOpenDialog.setOnClickListener(v -> {
-            fileDialog = SafDialog.create(MainActivity.this)
-                    .setSelectType(FileDialog.FILE_OPEN)
+            fileDialog = SafDialog.create(MainActivity.this, storageHelper)
+                    .setSelectType(FileDialog.FOLDER_CHOOSE)
                     .setMimeTypes(SafDialog.EXCEL_FILE_MIMES)
-                    .setFileName("1234567")
-                    .setSafLauncher(fileDialogLauncher)
-                    .setFileNameDialogListener((uri, s) -> {
+                    .setFileDialogListener((uri) -> {
                         GuiUtils.showMessage(MainActivity.this, uri.toString());
                         Log.d("selected_file", "uri: " + uri.toString());
                     })
