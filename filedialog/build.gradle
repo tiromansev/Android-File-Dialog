@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -16,39 +17,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'com.tiromansev.filedialog'
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_21
     }
     lintOptions {
         abortOnError false
     }
 }
 
-task androidSourcesJar(type: Jar) {
-    classifier 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-project.afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                artifact androidSourcesJar // optional sources
-            }
-        }
-    }
-}
-
 dependencies {
-    implementation "com.anggrayudi:storage:1.5.4"
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation "com.anggrayudi:storage:2.0.0"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.github.tiromansev:Android-Prefs-Wrapper:0.3.4'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'com.google.android.material:material:1.4.0'//после обновления проверять работу приложения, могут быть сбои!!
+    implementation 'com.google.android.material:material:1.12.0'//после обновления проверять работу приложения, могут быть сбои!!
     testImplementation 'junit:junit:4.13.2'
 }
