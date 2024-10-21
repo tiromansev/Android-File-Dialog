@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
         btnOpenDialog.setOnClickListener(v -> {
             fileDialog = SafDialog.create(MainActivity.this, storageHelper)
-                    .setSelectType(FileDialog.FOLDER_CHOOSE)
-                    .setMimeTypes(SafDialog.EXCEL_FILE_MIMES)
+                    .setSelectType(FileDialog.FILE_OPEN)
+                    .setMimeType(SafDialog.BINARY_MIME)
                     .setFileDialogListener((uri) -> {
                         GuiUtils.showMessage(MainActivity.this, uri.toString());
                         Log.d("selected_file", "uri: " + uri.toString());
