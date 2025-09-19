@@ -39,3 +39,6 @@ captures/
 # Keystore files
 *.jks
 .idea
+
+# Claude Code configuration
+CLAUDE.md

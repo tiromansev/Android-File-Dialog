@@ -21,12 +21,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BreadCrumbs {
 
-    private HashMap<View, Integer> items = new HashMap<>();
+    private LinkedHashMap<View, Integer> items = new LinkedHashMap<>();
     private Toolbar toolbar = null;
     private HorizontalScrollView parent = null;
     private Context context;
@@ -240,8 +241,8 @@ public class BreadCrumbs {
         }
     }
 
-    public HashMap<String, Integer> getItems() {
-        HashMap<String, Integer> saveItems = new HashMap<>();
+    public LinkedHashMap<String, Integer> getItems() {
+        LinkedHashMap<String, Integer> saveItems = new LinkedHashMap<>();
         if (!items.isEmpty()) {
             for (Map.Entry<View, Integer> entry: items.entrySet()) {
                 if (entry.getKey() instanceof TextView) {
@@ -261,21 +262,18 @@ public class BreadCrumbs {
         saveState(outState, ITEMS);
     }
 
-    public void setItems(HashMap<String, Integer> restoreItems) {
+    public void setItems(LinkedHashMap<String, Integer> restoreItems) {
         setItems(restoreItems, true);
     }
 
-    private List<Map.Entry<String, Integer>> getSortedItems(HashMap<String, Integer> items) {
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(items.entrySet());
-        Collections.sort(list, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-
-        return list;
+    private List<Map.Entry<String, Integer>> getOrderedItems(LinkedHashMap<String, Integer> items) {
+        return new ArrayList<>(items.entrySet());
     }
 
-    public void setItems(HashMap<String, Integer> restoreItems, boolean useAttrs) {
+    public void setItems(LinkedHashMap<String, Integer> restoreItems, boolean useAttrs) {
         if (!restoreItems.isEmpty()) {
             addHomeItem(String.valueOf(UNDEFINED_VALUE));
-            List<Map.Entry<String, Integer>> list = getSortedItems(restoreItems);
+            List<Map.Entry<String, Integer>> list = getOrderedItems(restoreItems);
 
             for (Map.Entry<String, Integer> entry: list) {
                 Log.d("save_breadcrumbs", "restore item id = " + entry.getKey());
@@ -290,7 +288,7 @@ public class BreadCrumbs {
 
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
-            HashMap<String, Integer> restoreItems = (HashMap<String, Integer>) inState.getSerializable(tag);
+            LinkedHashMap<String, Integer> restoreItems = (LinkedHashMap<String, Integer>) inState.getSerializable(tag);
             setItems(restoreItems);
         }
     }
