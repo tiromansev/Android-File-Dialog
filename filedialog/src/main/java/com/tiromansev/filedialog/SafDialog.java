@@ -135,9 +135,9 @@ public class SafDialog implements IFileDialog {
         switch (selectType) {
             case FILE_OPEN:
                 if (mimeTypes.length > 0) {
-                    storageHelper.openFilePicker(0, false, mimeTypes);
+                    storageHelper.openFilePicker(3, false, mimeTypes);
                 } else {
-                    storageHelper.openFilePicker(0, false, mimeType);
+                    storageHelper.openFilePicker(3, false, mimeType);
                 }
                 break;
             case FOLDER_CHOOSE:
