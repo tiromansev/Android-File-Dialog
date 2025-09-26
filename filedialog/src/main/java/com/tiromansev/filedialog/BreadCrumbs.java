@@ -288,8 +288,16 @@ public class BreadCrumbs {
 
     public void restoreState(Bundle inState, String tag) {
         if (inState != null) {
-            LinkedHashMap<String, Integer> restoreItems = (LinkedHashMap<String, Integer>) inState.getSerializable(tag);
-            setItems(restoreItems);
+            Object serializedItems = inState.getSerializable(tag);
+            if (serializedItems instanceof LinkedHashMap) {
+                LinkedHashMap<String, Integer> restoreItems = (LinkedHashMap<String, Integer>) serializedItems;
+                setItems(restoreItems);
+            } else if (serializedItems instanceof HashMap) {
+                // Handle legacy HashMap data by converting to LinkedHashMap
+                HashMap<String, Integer> legacyItems = (HashMap<String, Integer>) serializedItems;
+                LinkedHashMap<String, Integer> restoreItems = new LinkedHashMap<>(legacyItems);
+                setItems(restoreItems);
+            }
         }
     }
 
