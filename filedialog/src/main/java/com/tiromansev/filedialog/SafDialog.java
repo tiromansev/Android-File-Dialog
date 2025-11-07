@@ -78,6 +78,11 @@ public class SafDialog implements IFileDialog {
     }
 
     public void setMimeTypes(String[] mimeTypes) {
+        if (mimeTypes == null || mimeTypes.length == 0) {
+            this.mimeTypes = new String[]{};
+            return;
+        }
+
         this.mimeTypes = new String[mimeTypes.length];
 
         for (int i = 0; i < mimeTypes.length; i++) {
@@ -196,12 +201,16 @@ public class SafDialog implements IFileDialog {
         // Use FilePathHelper to automatically use saved folder location as initial path
         switch (selectType) {
             case FILE_OPEN:
-                if (mimeTypes.length > 0) {
+                if (mimeTypes != null && mimeTypes.length > 0) {
                     FilePathHelper.openFilePickerWithSavedPath(
                             storageHelper, getContext(), 3, false, mimeTypes);
-                } else {
+                } else if (mimeType != null && !mimeType.isEmpty()) {
                     FilePathHelper.openFilePickerWithSavedPath(
                             storageHelper, getContext(), 3, false, mimeType);
+                } else {
+                    // No mime type specified at all - use empty array
+                    FilePathHelper.openFilePickerWithSavedPath(
+                            storageHelper, getContext(), 3, false, new String[]{});
                 }
                 break;
             case FOLDER_CHOOSE:

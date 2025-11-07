@@ -111,8 +111,17 @@ object FilePathHelper {
         // Use fallback without initialPath
         when {
             mimeTypes.isEmpty() -> {
-                // No mime type specified - not supported, use generic
-                // storageHelper doesn't have a no-args openFilePicker
+                // No mime type specified - use generic with reflection
+                try {
+                    val method = storageHelper.javaClass.getMethod(
+                        "openFilePicker",
+                        Int::class.javaPrimitiveType,
+                        Boolean::class.javaPrimitiveType
+                    )
+                    method.invoke(storageHelper, requestCode, allowMultiple)
+                } catch (e: Exception) {
+                    // Can't open without mime type
+                }
             }
             mimeTypes.size == 1 -> {
                 openFilePickerWithSavedPath(storageHelper, context, requestCode, allowMultiple, mimeTypes[0])
