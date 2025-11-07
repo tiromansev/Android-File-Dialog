@@ -19,4 +19,11 @@ public class AppPrefs {
                 .build();
     }
 
+    public static StringPreference lastSafFolderUri() {
+        return StringPreference.
+                builder("preferences_saf_dialog_last_folder_uri")
+                .setDefaultValue("")
+                .build();
+    }
+
 }
