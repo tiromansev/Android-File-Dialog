@@ -10,4 +10,8 @@
     <string name="caption_file_name">Имя файла</string>
     <string name="message_intent_not_have_activity">There is no application capable to perform this action</string>
     <string name="message_wrong_file_ext">Wrong file type!</string>
+    <string name="caption_choose_folder">Choose Folder</string>
+    <string name="message_reuse_last_folder">Use the last selected folder \"%1$s\"?</string>
+    <string name="caption_use_this_folder">Use This Folder</string>
+    <string name="caption_choose_different_folder">Choose Different</string>
 </resources>

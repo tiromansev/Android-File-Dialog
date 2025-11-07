@@ -10,4 +10,8 @@
     <string name="caption_file_name">Имя файла</string>
     <string name="message_intent_not_have_activity">Не найдено ни одного приложения которое может выполнить данное действие!</string>
     <string name="message_wrong_file_ext">Неправильный тип файла!</string>
+    <string name="caption_choose_folder">Выбор папки</string>
+    <string name="message_reuse_last_folder">Использовать последнюю выбранную папку \"%1$s\"?</string>
+    <string name="caption_use_this_folder">Использовать эту папку</string>
+    <string name="caption_choose_different_folder">Выбрать другую</string>
 </resources>

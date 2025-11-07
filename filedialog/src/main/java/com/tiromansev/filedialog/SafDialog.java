@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.anggrayudi.storage.SimpleStorageHelper;
 import com.tiromansev.filedialog.utils.FileUtils;
@@ -94,6 +95,25 @@ public class SafDialog implements IFileDialog {
         return context.get();
     }
 
+    /**
+     * Gets the last selected folder URI that was saved from previous dialog operations
+     * @return The last folder URI or null if none was saved
+     */
+    public static Uri getLastFolderUri() {
+        String uriString = AppPrefs.lastSafFolderUri().getValue();
+        if (!TextUtils.isEmpty(uriString)) {
+            return Uri.parse(uriString);
+        }
+        return null;
+    }
+
+    /**
+     * Clears the saved last folder URI
+     */
+    public static void clearLastFolderUri() {
+        AppPrefs.lastSafFolderUri().setValue("");
+    }
+
     public void setMimeType(String mimeType) {
         //workaround - with text/plain and text/csv csv files in document picker are grayed out
         if (mimeType.equals("text/plain") || mimeType.equals("text/csv")) {
@@ -123,7 +143,48 @@ public class SafDialog implements IFileDialog {
     }
 
     public void show() {
+        // For FOLDER_CHOOSE, check if we should offer to reuse last folder
+        if (selectType == FOLDER_CHOOSE) {
+            Uri lastFolder = getLastFolderUri();
+            if (lastFolder != null && isUriValid(lastFolder)) {
+                showReuseLastFolderDialog(lastFolder);
+                return;
+            }
+        }
         launchSaf();
+    }
+
+    private boolean isUriValid(Uri uri) {
+        try {
+            SafFile safFile = new SafFile(getContext(), uri);
+            return safFile.getFile() != null && safFile.getFile().exists();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void showReuseLastFolderDialog(Uri lastFolder) {
+        SafFile safFile = new SafFile(getContext(), lastFolder);
+        String folderName = safFile.getName();
+
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+            .setTitle(R.string.caption_choose_folder)
+            .setMessage(getContext().getString(R.string.message_reuse_last_folder, folderName))
+            .setPositiveButton(R.string.caption_use_this_folder, (dialog, which) -> {
+                // User wants to reuse last folder
+                if (fileDialogListener != null) {
+                    fileDialogListener.onFileResult(lastFolder);
+                }
+                if (fileNameDialogListener != null) {
+                    fileNameDialogListener.onFileResult(lastFolder, null);
+                }
+            })
+            .setNegativeButton(R.string.caption_choose_different_folder, (dialog, which) -> {
+                // User wants to pick a different folder
+                launchSaf();
+            })
+            .setCancelable(true)
+            .show();
     }
 
     @Override
@@ -132,19 +193,23 @@ public class SafDialog implements IFileDialog {
     }
 
     private void launchSaf() {
+        // Use FilePathHelper to automatically use saved folder location as initial path
         switch (selectType) {
             case FILE_OPEN:
                 if (mimeTypes.length > 0) {
-                    storageHelper.openFilePicker(3, false, mimeTypes);
+                    FilePathHelper.openFilePickerWithSavedPath(
+                            storageHelper, getContext(), 3, false, mimeTypes);
                 } else {
-                    storageHelper.openFilePicker(3, false, mimeType);
+                    FilePathHelper.openFilePickerWithSavedPath(
+                            storageHelper, getContext(), 3, false, mimeType);
                 }
                 break;
             case FOLDER_CHOOSE:
-                storageHelper.openFolderPicker();
+                FilePathHelper.openFolderPickerWithSavedPath(storageHelper, getContext(), 3);
                 break;
             case FILE_SAVE:
-                storageHelper.createFile(mimeType, fileName);
+                FilePathHelper.createFileWithSavedPath(
+                        storageHelper, getContext(), mimeType, fileName);
                 break;
         }
     }
@@ -154,12 +219,70 @@ public class SafDialog implements IFileDialog {
             GuiUtils.showMessage(getContext(), R.string.message_file_must_be_selected);
             return;
         }
+
+        // Save the folder URI for future use
+        saveFolderUri(uri);
+
         SafFile safFile = new SafFile(getContext(), uri);
 
         if (selectType == FILE_OPEN)
             openFile(safFile);
         else
             saveFile(safFile);
+    }
+
+    private void saveFolderUri(Uri uri) {
+        if (uri == null) {
+            return;
+        }
+
+        // For FOLDER_CHOOSE, save the folder URI directly
+        if (selectType == FOLDER_CHOOSE) {
+            AppPrefs.lastSafFolderUri().setValue(uri.toString());
+        }
+        // For FILE_SAVE, extract parent folder from file URI
+        else if (selectType == FILE_SAVE) {
+            Uri folderUri = extractParentFolderUri(uri);
+            if (folderUri != null) {
+                AppPrefs.lastSafFolderUri().setValue(folderUri.toString());
+            }
+        }
+        // For FILE_OPEN, optionally save the parent folder
+        else if (selectType == FILE_OPEN) {
+            Uri folderUri = extractParentFolderUri(uri);
+            if (folderUri != null) {
+                AppPrefs.lastSafFolderUri().setValue(folderUri.toString());
+            }
+        }
+    }
+
+    private Uri extractParentFolderUri(Uri fileUri) {
+        if (fileUri == null) {
+            return null;
+        }
+
+        try {
+            // DocumentFile approach to get parent
+            DocumentFile documentFile = DocumentFile.fromSingleUri(getContext(), fileUri);
+            if (documentFile != null && documentFile.getParentFile() != null) {
+                return documentFile.getParentFile().getUri();
+            }
+
+            // Fallback: parse URI string to extract parent
+            String uriString = fileUri.toString();
+            int lastSlash = uriString.lastIndexOf("%2F");
+            if (lastSlash == -1) {
+                lastSlash = uriString.lastIndexOf("/");
+            }
+            if (lastSlash > 0) {
+                String parentUriString = uriString.substring(0, lastSlash);
+                return Uri.parse(parentUriString);
+            }
+        } catch (Exception e) {
+            // Ignore errors in parent extraction
+        }
+
+        return null;
     }
 
     private void saveFile(SafFile safFile) {
