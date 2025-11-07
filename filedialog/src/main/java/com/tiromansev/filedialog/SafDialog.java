@@ -198,25 +198,25 @@ public class SafDialog implements IFileDialog {
     }
 
     private void launchSaf() {
-        // Use FilePathHelper to automatically use saved folder location as initial path
         switch (selectType) {
             case FILE_OPEN:
+                // For FILE_OPEN, we can't pre-select folder with SimpleStorageHelper 2.2.0
+                // Just open the picker normally
                 if (mimeTypes != null && mimeTypes.length > 0) {
-                    FilePathHelper.openFilePickerWithSavedPath(
-                            storageHelper, getContext(), 3, false, mimeTypes);
+                    storageHelper.openFilePicker(3, false, mimeTypes);
                 } else if (mimeType != null && !mimeType.isEmpty()) {
-                    FilePathHelper.openFilePickerWithSavedPath(
-                            storageHelper, getContext(), 3, false, mimeType);
+                    storageHelper.openFilePicker(3, false, mimeType);
                 } else {
-                    // No mime type specified at all - use empty array
-                    FilePathHelper.openFilePickerWithSavedPath(
-                            storageHelper, getContext(), 3, false, new String[]{});
+                    // No mime type - open with generic filter
+                    storageHelper.openFilePicker(3, false, "*/*");
                 }
                 break;
             case FOLDER_CHOOSE:
-                FilePathHelper.openFolderPickerWithSavedPath(storageHelper, getContext(), 3);
+                // For FOLDER_CHOOSE, we handle it in show() with the reuse dialog
+                storageHelper.openFolderPicker(3);
                 break;
             case FILE_SAVE:
+                // For FILE_SAVE, try to use initialPath feature
                 FilePathHelper.createFileWithSavedPath(
                         storageHelper, getContext(), mimeType, fileName);
                 break;
